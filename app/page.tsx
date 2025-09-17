@@ -27,11 +27,27 @@ export default function LandingPage() {
               className="relative transition-colors duration-200 hover:text-purple-600 group"
               onClick={(e) => {
                 e.preventDefault();
+                const offset = 72; // height of navbar (px)
                 if (item.target === "top") {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 } else {
                   const el = document.getElementById(item.target);
-                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                  if (el) {
+                    // For "Pricing", scroll to the CTA section, not the image
+                    if (item.target === "cta") {
+                      const y =
+                        el.getBoundingClientRect().top +
+                        window.scrollY -
+                        offset;
+                      window.scrollTo({ top: y, behavior: "smooth" });
+                    } else {
+                      const y =
+                        el.getBoundingClientRect().top +
+                        window.scrollY -
+                        offset;
+                      window.scrollTo({ top: y, behavior: "smooth" });
+                    }
+                  }
                 }
               }}>
               {item.name}

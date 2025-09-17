@@ -1,13 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Bell, Plus, LogOut, LayoutDashboard, Package, BookOpen, ShoppingCart, BarChart } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userName, setUserName] = useState<string>("Artisan");
   const router = useRouter();
-  const userName = "Sarah Miller";
+
+  useEffect(() => {
+    // Load name from localStorage
+    const storedName = localStorage.getItem("artisanName");
+    if (storedName) {
+      setUserName(storedName);
+    }
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans text-sm">
@@ -47,7 +55,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-3">
             <img
               src="/images/sarah-avatar.jpg"
-              alt="Sarah"
+              alt={userName}
               className="w-10 h-10 rounded-full"
             />
             <div>
