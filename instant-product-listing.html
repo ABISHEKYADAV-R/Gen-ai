@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Product Listing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header-icon {
+            width: 32px;
+            height: 32px;
+            background: #ff9500;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .header-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .help-btn, .profile-btn {
+            background: #f0f0f0;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .left-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .right-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .section-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        .image-upload {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 60px 20px;
+            text-align: center;
+            background: #fafafa;
+            margin-bottom: 16px;
+        }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            background: #ff9500;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .upload-text {
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .choose-file-btn {
+            background: #ff9500;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .ai-detected {
+            background: #e8f5e8;
+            color: #2d5a2d;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .ai-detected::before {
+            content: "✓";
+            margin-right: 6px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .checkbox {
+            width: 16px;
+            height: 16px;
+        }
+
+        .ai-materials {
+            background: #f0f0ff;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+
+        .material-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .confidence-bar {
+            width: 100px;
+            height: 4px;
+            background: #eee;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: #ff9500;
+            border-radius: 2px;
+        }
+
+        .pricing-section {
+            background: #fff9e6;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #ff9500;
+        }
+
+        .price-input {
+            font-size: 18px;
+            font-weight: 600;
+            width: 80px;
+            margin-right: 16px;
+        }
+
+        .price-recommendation {
+            background: #e8f5e8;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #2d5a2d;
+        }
+
+        .description-textarea {
+            width: 100%;
+            height: 80px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            resize: vertical;
+            font-size: 14px;
+        }
+
+        .generate-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            background: #e6f3ff;
+            color: #0066cc;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .add-tag-btn {
+            background: none;
+            border: 1px dashed #ccc;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .bottom-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+        }
+
+        .save-draft-btn {
+            background: #f0f0f0;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .publish-btn {
+            background: #ff9500;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Right Panel Styles */
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .preview-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: #f0f0f0;
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .view-btn {
+            background: none;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .view-btn.active {
+            background: white;
+            font-weight: 600;
+        }
+
+        .product-preview {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8f8f8;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .product-badges {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .eco-badge {
+            background: #28a745;
+            color: white;
+        }
+
+        .authentic-badge {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .product-info {
+            padding: 16px;
+            background: white;
+        }
+
+        .product-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ff9500;
+            margin-bottom: 4px;
+        }
+
+        .product-original-price {
+            font-size: 12px;
+            color: #666;
+            text-decoration: line-through;
+        }
+
+        .product-description {
+            font-size: 13px;
+            color: #666;
+            margin: 12px 0;
+            line-height: 1.4;
+        }
+
+        .product-tags {
+            display: flex;
+            gap: 6px;
+            margin: 12px 0;
+        }
+
+        .product-tag {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .product-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+
+        .shipping-info {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .add-to-cart {
+            background: #ff9500;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .preview-status {
+            background: #e8f5e8;
+            color: #2d5a2d;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-top: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">📋</div>
+            <div>
+                <div class="header-title">Instant Product Listing</div>
+                <div class="header-subtitle">Upload your craft, let AI suggest pricing & descriptions.</div>
+            </div>
+            <div class="header-right">
+                <button class="help-btn">?</button>
+                <button class="profile-btn">👤</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel -->
+            <div class="left-panel">
+                <!-- Product Image Section -->
+                <div class="section">
+                    <div class="section-title">
+                        📷 Product Image
+                    </div>
+                    <div class="image-upload">
+                        <div class="upload-icon">☁️</div>
+                        <div class="upload-text">Drag & drop your craft image here</div>
+                        <button class="choose-file-btn">+ Choose File</button>
+                    </div>
+                    <div class="ai-detected">AI Detected: Ceramic Pottery</div>
+                </div>
+
+                <!-- AI Materials Detection -->
+                <div class="section">
+                    <div class="section-title">🤖 AI Materials Detected</div>
+                    <div class="ai-materials">
+                        <div class="material-item">
+                            <span>Clay</span>
+                            <div>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" style="width: 98%"></div>
+                                </div>
+                                <small>98%</small>
+                            </div>
+                        </div>
+                        <div class="material-item">
+                            <span>Hand-painted glaze</span>
+                            <div>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" style="width: 92%"></div>
+                                </div>
+                                <small>92%</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Product Title</label>
+                        <input type="text" class="form-input" value="Handcrafted Ceramic Vase">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select class="form-select">
+                            <option>Ceramics</option>
+                            <option>Pottery</option>
+                            <option>Home Decor</option>
+                        </select>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="checkbox" checked>
+                        <label>🌱 Eco-friendly/handcrafted</label>
+                    </div>
+                </div>
+
+                <!-- AI-Powered Pricing Assistant -->
+                <div class="section">
+                    <div class="section-title">💰 AI-Powered Pricing Assistant</div>
+                    <div class="pricing-section">
+                        <div style="margin-bottom: 12px;">
+                            <span>Your Price</span>
+                            <input type="text" class="form-input price-input" value="45.00" style="display: inline-block; width: auto; margin-left: 8px;">
+                        </div>
+                        <div class="price-recommendation">
+                            <strong>AI Recommended Range</strong><br>
+                            $42 - $58<br>
+                            <small>based on market trends</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description Builder -->
+                <div class="section">
+                    <div class="section-title">📝 Description Builder</div>
+                    <textarea class="description-textarea" placeholder="Write your product description..."></textarea>
+                    <button class="generate-btn">✨ Generate AI Description</button>
+                    
+                    <div style="margin-top: 16px;">
+                        <label class="form-label">Tags & Keywords</label>
+                        <div class="tags">
+                            <span class="tag">handmade</span>
+                            <span class="tag">ceramic</span>
+                            <span class="tag">vase</span>
+                            <button class="add-tag-btn">+ Add Tag</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Global Shipping -->
+                <div class="section">
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="checkbox" checked>
+                        <label>🌍 Global Shipping</label>
+                    </div>
+                    <small style="color: #666;">Est. cost: $8-15 worldwide based on size & weight</small>
+                </div>
+
+                <!-- Authenticity Badge -->
+                <div class="section">
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="checkbox" checked>
+                        <label>🛡️ Authenticity Badge</label>
+                    </div>
+                    <select class="form-select" style="margin-top: 8px;">
+                        <option>Traditional Pottery</option>
+                        <option>Modern Ceramic</option>
+                        <option>Artisan Crafted</option>
+                    </select>
+                </div>
+
+                <!-- Bottom Actions -->
+                <div class="bottom-actions">
+                    <button class="save-draft-btn">💾 Save as Draft</button>
+                    <button class="publish-btn">📤 Publish Product</button>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="right-panel">
+                <div class="preview-header">
+                    <div class="preview-title">Live Preview</div>
+                    <div class="view-toggle">
+                        <button class="view-btn active">🖥️ Desktop</button>
+                        <button class="view-btn">📱 Mobile</button>
+                    </div>
+                </div>
+
+                <div class="product-preview" style="position: relative;">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0idmFzZUdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmZmY7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojZWVkO3N0b3Atb3BhY2l0eToxIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjQwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmYzU0NTtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSI2MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmZmE1MDA7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iODAlIiBzdHlsZT0ic3RvcC1jb2xvcjojZGRkO3N0b3Atb3BhY2l0eToxIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNhYWE7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2Y4ZjhmOCIvPgogIDxlbGxpcHNlIGN4PSIyMDAiIGN5PSIyNjAiIHJ4PSI4MCIgcnk9IjIwIiBmaWxsPSIjZGRkIi8+CiAgPHBhdGggZD0iTTE1MCAyNTAgQzE1MCAyNTAgMTUwIDIwMCAxNTAgMTUwIEMxNTAgMTAwIDE3MCA4MCAyMDAgODAgQzIzMCA4MCAyNTAgMTAwIDI1MCAxNTAgQzI1MCAyMDAgMjUwIDI1MCAyNTAgMjUwIEwyMDAgMjUwIFoiIGZpbGw9InVybCgjdmFzZUdyYWRpZW50KSIgc3Ryb2tlPSIjYmJiIiBzdHJva2Utd2lkdGg9IjEiLz4KICA8ZWxsaXBzZSBjeD0iMjAwIiBjeT0iODAiIHJ4PSI1MCIgcnk9IjE1IiBmaWxsPSIjZmZmIiBzdHJva2U9IiNiYmIiIHN0cm9rZS13aWR0aD0iMSIvPgo8L3N2Zz4=" alt="Ceramic Vase" class="product-image">
+                    
+                    <div class="product-badges">
+                        <span class="badge eco-badge">🌱 Eco-friendly</span>
+                        <span class="badge authentic-badge">🛡️ Authentic</span>
+                    </div>
+                </div>
+
+                <div class="product-info">
+                    <div class="product-title">Handcrafted Ceramic Vase</div>
+                    <div class="product-price">$45.00</div>
+                    <div class="product-original-price">Recommended: $42-$58</div>
+                    
+                    <div class="product-description">
+                        Beautiful handcrafted ceramic vase made with traditional techniques. Perfect for home decoration and flower arrangements.
+                    </div>
+                    
+                    <div class="product-tags">
+                        <span class="product-tag">handmade</span>
+                        <span class="product-tag">ceramic</span>
+                        <span class="product-tag">vase</span>
+                    </div>
+                    
+                    <div class="product-actions">
+                        <div>
+                            <div style="font-size: 11px; color: #666;">🚚 Ships worldwide</div>
+                            <div style="font-size: 11px; color: #666;">❤️</div>
+                        </div>
+                        <button class="add-to-cart">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="preview-status">
+                    ✅ Preview looks great! Ready to publish.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // File upload functionality
+        document.querySelector('.choose-file-btn').addEventListener('click', function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.querySelector('.product-image').src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        });
+
+        // View toggle functionality
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Generate AI Description
+        document.querySelector('.generate-btn').addEventListener('click', function() {
+            const descriptions = [
+                "Beautiful handcrafted ceramic vase made with traditional techniques. Perfect for home decoration and flower arrangements.",
+                "Elegant ceramic vase featuring unique hand-painted glazes. Each piece is one-of-a-kind and makes a stunning centerpiece.",
+                "Artisan-crafted ceramic vase with earthy tones and organic shapes. Ideal for modern and traditional home decor."
+            ];
+            const randomDescription = descriptions[Math.floor(Math.random() * descriptions.length)];
+            document.querySelector('.description-textarea').value = randomDescription;
+            document.querySelector('.product-description').textContent = randomDescription;
+        });
+
+        // Add tag functionality
+        document.querySelector('.add-tag-btn').addEventListener('click', function() {
+            const tag = prompt('Enter a new tag:');
+            if (tag) {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'tag';
+                tagElement.textContent = tag;
+                this.parentNode.insertBefore(tagElement, this);
+                
+                // Also add to preview
+                const previewTag = document.createElement('span');
+                previewTag.className = 'product-tag';
+                previewTag.textContent = tag;
+                document.querySelector('.product-tags').appendChild(previewTag);
+            }
+        });
+
+        // Live updates
+        document.querySelector('input[value="Handcrafted Ceramic Vase"]').addEventListener('input', function() {
+            document.querySelector('.product-title').textContent = this.value;
+        });
+
+        document.querySelector('input[value="45.00"]').addEventListener('input', function() {
+            document.querySelector('.product-price').textContent = '$' + this.value;
+        });
+
+        document.querySelector('.description-textarea').addEventListener('input', function() {
+            document.querySelector('.product-description').textContent = this.value;
+        });
+    </script>
+</body>
+</html>

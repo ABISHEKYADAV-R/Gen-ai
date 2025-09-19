@@ -35,7 +35,14 @@ export default function Dashboard() {
             <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-md bg-amber-50 text-amber-700 font-medium">
               <LayoutDashboard className="w-4 h-4" /> Dashboard
             </a>
-            <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-50">
+            <a 
+              href="/instant-product-listing" 
+              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-50"
+              onClick={(e) => {
+                e.preventDefault();
+                router.push("/instant-product-listing");
+              }}
+            >
               <Package className="w-4 h-4" /> My Products
             </a>
             <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-50">
@@ -102,7 +109,10 @@ export default function Dashboard() {
                 3
               </span>
             </button>
-            <button className="flex items-center gap-2 bg-amber-700 text-white px-3 py-2 rounded-md shadow">
+            <button 
+              className="flex items-center gap-2 bg-amber-700 text-white px-3 py-2 rounded-md shadow"
+              onClick={() => router.push("/instant-product-listing")}
+            >
               <Plus className="w-4 h-4" />
               Quick Add
             </button>
@@ -147,7 +157,10 @@ export default function Dashboard() {
               Upload photos and set prices for your crafts in minutes. Our smart
               pricing suggestions help you stay competitive.
             </p>
-            <button className="mt-4 w-full bg-amber-700 text-white py-2 rounded-md">
+            <button 
+              className="mt-4 w-full bg-amber-700 text-white py-2 rounded-md"
+              onClick={() => router.push("/instant-product-listing")}
+            >
               + Add New Product
             </button>
           </div>
@@ -162,7 +175,10 @@ export default function Dashboard() {
               Let AI help you craft compelling stories about your artisan
               journey. Engage customers with your unique narrative.
             </p>
-            <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md">
+            <button
+              className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md"
+              onClick={() => router.push("/story-builder")}
+            >
               ✎ Create My Story
             </button>
           </div>

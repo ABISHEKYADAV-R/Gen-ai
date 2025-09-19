@@ -484,7 +484,10 @@ export default function LandingPage() {
           storytelling.
         </p>
         <div className="flex justify-center space-x-6">
-          <Button className="bg-white text-purple-600 px-6 py-3 rounded-xl text-lg">
+          <Button 
+            className="bg-white text-purple-600 px-6 py-3 rounded-xl text-lg"
+            onClick={() => router.push("/instant-product-listing")}
+          >
             Start Free Trial
           </Button>
           <Button
