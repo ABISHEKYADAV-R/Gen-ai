@@ -1,21 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Bell, Plus, LogOut, LayoutDashboard, Package, BookOpen, ShoppingCart, BarChart } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../contexts/AuthContext";
+import { authService } from "../../backend/firebase/authService";
+import { ProtectedRoute } from "../../components/ProtectedRoute";
 
-export default function Dashboard() {
+function DashboardContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [userName, setUserName] = useState<string>("Artisan");
+  const { user, userProfile } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    // Load name from localStorage
-    const storedName = localStorage.getItem("artisanName");
-    if (storedName) {
-      setUserName(storedName);
+  const handleLogout = async () => {
+    try {
+      await authService.signOut();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
     }
-  }, []);
+  };
+
+  const displayName = userProfile?.displayName || user?.displayName || user?.email?.split('@')[0] || "Artisan";
 
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans text-sm">
@@ -36,14 +42,14 @@ export default function Dashboard() {
               <LayoutDashboard className="w-4 h-4" /> Dashboard
             </a>
             <a 
-              href="/instant-product-listing" 
+              href="/products" 
               className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-50"
               onClick={(e) => {
                 e.preventDefault();
-                router.push("/instant-product-listing");
+                router.push("/products");
               }}
             >
-              <Package className="w-4 h-4" /> My Products
+              <Package className="w-4 h-4" /> Products
             </a>
             <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-50">
               <BookOpen className="w-4 h-4" /> My Story
@@ -60,18 +66,26 @@ export default function Dashboard() {
         {/* Bottom Section (Profile + Logout) */}
         <div className="px-4 pb-6 border-t">
           <div className="flex items-center gap-3">
-            <img
-              src="/images/sarah-avatar.jpg"
-              alt={userName}
-              className="w-10 h-10 rounded-full"
-            />
+            {user?.photoURL ? (
+              <img
+                src={user.photoURL}
+                alt={displayName}
+                className="w-10 h-10 rounded-full"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                <span className="text-amber-700 font-bold text-sm">
+                  {displayName.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
             <div>
-              <div className="font-medium">{userName}</div>
+              <div className="font-medium">{displayName}</div>
               <div className="text-xs text-gray-400">Ceramic Artist</div>
             </div>
           </div>
           <button
-            onClick={() => router.push("/login")}
+            onClick={handleLogout}
             className="mt-4 w-full flex items-center gap-2 text-gray-600 hover:text-gray-800"
           >
             <LogOut className="w-4 h-4" />
@@ -86,14 +100,22 @@ export default function Dashboard() {
         <div className="px-6 py-6 border-b bg-white flex items-center justify-between">
           {/* Left section: Avatar + Welcome */}
           <div className="flex items-center gap-4">
-            <img
-              src="/images/sarah-avatar.jpg"
-              alt={userName}
-              className="w-12 h-12 rounded-full border-2 border-amber-700"
-            />
+            {user?.photoURL ? (
+              <img
+                src={user.photoURL}
+                alt={displayName}
+                className="w-12 h-12 rounded-full border-2 border-amber-700"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center border-2 border-amber-700">
+                <span className="text-amber-700 font-bold text-lg">
+                  {displayName.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
             <div>
               <h2 className="text-xl font-extrabold">
-                Welcome back, {userName} <span className="inline-block">👋</span>
+                Welcome back, {displayName} <span className="inline-block">👋</span>
               </h2>
               <p className="text-sm text-gray-500">
                 Here's what's happening with your craft business today
@@ -111,7 +133,7 @@ export default function Dashboard() {
             </button>
             <button 
               className="flex items-center gap-2 bg-amber-700 text-white px-3 py-2 rounded-md shadow"
-              onClick={() => router.push("/instant-product-listing")}
+              onClick={() => router.push("/products")}
             >
               <Plus className="w-4 h-4" />
               Quick Add
@@ -149,19 +171,19 @@ export default function Dashboard() {
           <div className="p-6 bg-white rounded-lg border shadow-sm">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <span className="w-6 h-6 bg-amber-700 text-white flex items-center justify-center rounded">
-                ⬆
+                📦
               </span>
-              Instant Product Listing
+              Product Management
             </h3>
             <p className="text-gray-600 mt-2">
-              Upload photos and set prices for your crafts in minutes. Our smart
-              pricing suggestions help you stay competitive.
+              Review, manage, and publish your crafts to the marketplace. 
+              Select multiple products and perform bulk actions.
             </p>
             <button 
               className="mt-4 w-full bg-amber-700 text-white py-2 rounded-md"
-              onClick={() => router.push("/instant-product-listing")}
+              onClick={() => router.push("/products")}
             >
-              + Add New Product
+              + View Products
             </button>
           </div>
           <div className="p-6 bg-white rounded-lg border shadow-sm">
@@ -215,5 +237,13 @@ export default function Dashboard() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
   );
 }

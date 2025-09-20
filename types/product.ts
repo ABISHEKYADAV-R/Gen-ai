@@ -2,6 +2,7 @@ export interface ProductData {
   title: string
   price: string
   description: string
+  story?: string
   category: string
   tags: string[]
   isEcoFriendly: boolean

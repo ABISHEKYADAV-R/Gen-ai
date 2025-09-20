@@ -11,14 +11,21 @@ import DescriptionBuilder from '@/components/DescriptionBuilder'
 import ProductPreview from '@/components/ProductPreview'
 import MaterialAnalysisSection from '@/components/MaterialAnalysisSection'
 import { ProductData, ViewMode } from '@/types/product'
+import { useAuth } from '../../contexts/AuthContext'
+import { productService } from '../../backend/firebase/productService'
+import { useToast } from '../../lib/ToastContext'
 
 export default function InstantProductListing() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { user } = useAuth()
+  const { showToast } = useToast()
+  
   const [productData, setProductData] = useState<ProductData>({
     title: 'Handcrafted Ceramic Vase',
     price: '45.00',
     description: '',
+    story: '',
     category: 'Ceramics',
     tags: ['handmade', 'ceramic', 'vase'],
     isEcoFriendly: true,
@@ -29,13 +36,19 @@ export default function InstantProductListing() {
 
   const [activeView, setActiveView] = useState<ViewMode>('desktop')
   const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [showStoryImportedNotification, setShowStoryImportedNotification] = useState(false)
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false)
+  const [isGeneratingStory, setIsGeneratingStory] = useState(false)
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
   const [isSaving, setIsSaving] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
+  const [publishStep, setPublishStep] = useState('')
   const [showLoadDraftOption, setShowLoadDraftOption] = useState(false)
   const [materialAnalysis, setMaterialAnalysis] = useState<any>(null)
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false)
+  const [storyExpanded, setStoryExpanded] = useState(false)
+  const [currentProductId, setCurrentProductId] = useState<string | null>(null)
 
   // Load available drafts on component mount
   useEffect(() => {
@@ -54,10 +67,12 @@ export default function InstantProductListing() {
         if (storyContent) {
           setProductData(prev => ({
             ...prev,
-            description: storyContent
+            story: storyContent
           }))
           // Show notification
           setShowStoryImportedNotification(true)
+          // Expand story section to show the imported content
+          setStoryExpanded(true)
           // Clear the story content from localStorage after using it
           localStorage.removeItem('storyContent')
           // Hide notification after 5 seconds
@@ -133,10 +148,9 @@ export default function InstantProductListing() {
       const reader = new FileReader()
       reader.onload = (e) => {
         const result = e.target?.result as string
-        setProductData(prev => ({
-          ...prev,
-          imageUrl: result
-        }))
+        setImagePreview(result)
+        // Don't set imageUrl to base64 data - only set it when we have a proper upload URL
+        // setProductData(prev => ({ ...prev, imageUrl: result })) // REMOVED
       }
       reader.readAsDataURL(file)
       
@@ -150,10 +164,9 @@ export default function InstantProductListing() {
     const reader = new FileReader()
     reader.onload = (e) => {
       const result = e.target?.result as string
-      setProductData(prev => ({
-        ...prev,
-        imageUrl: result
-      }))
+      setImagePreview(result)
+      // Don't set imageUrl to base64 data - only set it when we have a proper upload URL
+      // setProductData(prev => ({ ...prev, imageUrl: result })) // REMOVED
     }
     reader.readAsDataURL(file)
     
@@ -268,6 +281,54 @@ export default function InstantProductListing() {
     }
   }
 
+  const generateAIStory = async () => {
+    setIsGeneratingStory(true)
+    
+    try {
+      // Enhanced artisan story templates with realistic challenges and processes
+      const authenticStoryPrompts = [
+        `The journey of creating this ${productData.title.toLowerCase()} began on a crisp morning in my workshop. I had been experimenting with ${materialAnalysis?.materials?.join(' and ') || 'local materials'} for weeks, but nothing felt quite right. The breakthrough came when I discovered how the ${materialAnalysis?.colors?.join(' and ') || 'natural'} tones could be enhanced through a traditional ${materialAnalysis?.techniques?.join(' ') || 'handcrafting'} technique my grandmother taught me. The biggest challenge was controlling the temperature - three pieces cracked before I mastered the timing. But when I finally held this finished piece, feeling its perfect weight and seeing how the light played across its surface, I knew every failed attempt was worth it. This isn't just a product; it's a piece of my heart and heritage.`,
+        
+        `I'll never forget the frustration of my first attempts at this ${productData.title.toLowerCase()}. Working with ${materialAnalysis?.materials?.join(' combined with ') || 'these materials'} seemed impossible at first - they would either be too brittle or too soft. I spent countless nights researching ancient ${materialAnalysis?.techniques?.join(' and ') || 'traditional'} methods, calling my mentor, and even traveling to a remote village to learn from master artisans. The turning point came during my fifth attempt when I realized I was rushing the process. This piece required patience - each layer of ${materialAnalysis?.colors?.join(' and ') || 'color'} needed time to settle and bond. The imperfections you see aren't flaws; they're the marks of an authentic, hand-made creation. When customers hold this, they're touching weeks of learning, failing, and ultimately succeeding.`,
+        
+        `Creating this ${productData.title.toLowerCase()} pushed me to my limits as an artisan. The ${materialAnalysis?.style || 'unique'} design you see came from a sketch I made during a difficult period in my life. Working with ${materialAnalysis?.materials?.join(', ') || 'raw materials'} became my meditation, but it wasn't easy. I had to source the materials from three different suppliers before finding ones that met my standards. The ${materialAnalysis?.techniques?.join(' technique combined with ') || 'crafting process'} required tools I had to specially modify. My workshop became a testing ground - covered in samples, failed prototypes, and notes scribbled at 2 AM. But gradually, through trial and error, I developed my own variation of the traditional method. Each ${materialAnalysis?.colors?.join(' and ') || 'color'} was mixed by hand, each curve shaped with tools passed down through generations. This piece represents not just skill, but resilience.`,
+        
+        `The story of this ${productData.title.toLowerCase()} starts with a problem that kept me awake for weeks. A customer had commissioned something similar, but every approach I tried failed. The ${materialAnalysis?.materials?.join(' wouldn\'t bond properly with the ') || 'materials'} using conventional methods. I was ready to give up when I remembered my grandfather's workshop - he had jars of mysterious substances labeled in his handwriting. After translating his old notes, I discovered a technique that had been forgotten for decades. Recreating his method with modern ${materialAnalysis?.techniques?.join(' and ') || 'tools'} took months of experimentation. I ruined countless pieces learning to balance tradition with innovation. The breakthrough came when I stopped fighting the material's natural properties and started working with them. This piece embodies that journey - you can see the subtle variations that come from hand-mixed ${materialAnalysis?.colors?.join(' and ') || 'pigments'} and time-honored techniques. It's proof that sometimes the old ways, adapted with love and persistence, create something truly extraordinary.`
+      ]
+      
+      // Simulate realistic crafting time
+      await new Promise(resolve => setTimeout(resolve, 2500))
+      
+      const selectedStory = authenticStoryPrompts[Math.floor(Math.random() * authenticStoryPrompts.length)]
+      
+      setProductData(prev => ({
+        ...prev,
+        story: selectedStory
+      }))
+      
+      // Auto-expand story section to show the generated content
+      setStoryExpanded(true)
+      
+    } catch (error) {
+      console.error('Error generating story:', error)
+      const fallbackStory = `When I first envisioned this ${productData.title.toLowerCase()}, I knew it would be challenging. Working in my small workshop, I carefully selected each material, knowing that the quality would show in the final piece. The process wasn't easy - there were moments when I questioned my technique, especially when the first attempts didn't meet my standards. After several late nights and many adjustments, I finally achieved the balance I was seeking. The ${materialAnalysis?.colors?.join(' and ') || 'colors'} you see are the result of careful experimentation, and the ${materialAnalysis?.techniques?.join(' ') || 'craftsmanship'} reflects years of practice. Each piece I create carries a part of my story, and this one is no exception. It represents not just skill, but the persistence to keep trying until it's right.`
+      
+      setProductData(prev => ({
+        ...prev,
+        story: fallbackStory
+      }))
+      
+      setStoryExpanded(true)
+      
+    } finally {
+      setIsGeneratingStory(false)
+    }
+  }
+
+  const navigateToStoryBuilder = () => {
+    router.push('/story-builder')
+  }
+
   const addTag = () => {
     const tag = prompt('Enter a new tag:')?.trim().toLowerCase()
     if (tag && !productData.tags.includes(tag) && tag.length > 0) {
@@ -320,6 +381,7 @@ export default function InstantProductListing() {
         title: 'Handcrafted Ceramic Vase',
         price: '45.00',
         description: '',
+        story: '',
         category: 'Ceramics',
         tags: ['handmade', 'ceramic', 'vase'],
         isEcoFriendly: true,
@@ -329,6 +391,7 @@ export default function InstantProductListing() {
       })
       setImageFile(null)
       setValidationErrors({})
+      setStoryExpanded(false)
     }
   }
 
@@ -353,45 +416,162 @@ export default function InstantProductListing() {
     alert(`Draft loaded: "${mostRecentDraft.title}" (saved ${new Date(savedAt).toLocaleString()})`)
   }
 
+  // Optimized image compression for faster processing
+  const compressImage = (file: File, maxWidth = 800, quality = 0.85): Promise<File> => {
+    return new Promise((resolve) => {
+      // Skip compression for small files (< 300KB)
+      if (file.size < 300000) {
+        resolve(file)
+        return
+      }
+
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')!
+      const img = new Image()
+      
+      img.onload = () => {
+        // Calculate new dimensions - better balance of quality and size
+        const ratio = Math.min(maxWidth / img.width, maxWidth / img.height)
+        canvas.width = img.width * ratio
+        canvas.height = img.height * ratio
+        
+        // Use better compression settings
+        ctx.imageSmoothingEnabled = true
+        ctx.imageSmoothingQuality = 'high'
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            })
+            resolve(compressedFile)
+          } else {
+            resolve(file) // Fallback to original
+          }
+        }, 'image/jpeg', quality)
+      }
+      
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
   const handlePublish = async () => {
-    if (!validateForm()) {
-      alert('Please fix the validation errors before publishing')
+    if (!user) {
+      showToast({
+        type: 'error',
+        title: 'Authentication Required',
+        message: 'Please log in to publish products'
+      })
       return
     }
     
-    setIsSaving(true)
+    if (!validateForm()) {
+      showToast({
+        type: 'error',
+        title: 'Validation Error',
+        message: 'Please fix the validation errors before publishing'
+      })
+      return
+    }
+    
+    setIsPublishing(true)
+    setPublishStep('Publishing product...')
+    
     try {
-      // Prepare product data for publishing
-      const publishData = {
-        ...productData,
-        imageFile: imageFile ? {
-          name: imageFile.name,
-          size: imageFile.size,
-          type: imageFile.type,
-          lastModified: imageFile.lastModified
-        } : null,
-        publishedAt: new Date().toISOString(),
-        status: 'published'
+      // Create product first without waiting for image upload
+      setPublishStep('Creating product...')
+      
+      // Prepare base product data
+      const productDataToSave = {
+        title: productData.title,
+        price: parseFloat(productData.price), // Convert string to number for Firebase rules
+        description: productData.description,
+        story: productData.story || '',
+        category: productData.category,
+        tags: productData.tags,
+        isEcoFriendly: productData.isEcoFriendly,
+        hasGlobalShipping: productData.hasGlobalShipping,
+        authenticityBadge: productData.authenticityBadge || '',
+        imageUrl: imagePreview || '', // Use preview initially if available
+        materials: materialAnalysis?.materials || [],
+        techniques: materialAnalysis?.techniques || [],
+        colors: materialAnalysis?.colors || [],
+        style: materialAnalysis?.style || '',
+        createdBy: user.uid,
+        status: 'published' as const,
+        shipping: {
+          estimatedDays: '3-7 days',
+          cost: 0,
+          regions: ['Global']
+        }
       }
 
-      // Simulate API call to publish product
-      console.log('Publishing product:', publishData)
-      await new Promise(resolve => setTimeout(resolve, 2500))
+      // Create product immediately for fast response
+      let result
+      if (currentProductId) {
+        result = await productService.updateProduct(currentProductId, productDataToSave)
+      } else {
+        result = await productService.createProduct(productDataToSave)
+        if (result.success) {
+          setCurrentProductId(result.productId!)
+        }
+      }
+
+      if (!result.success) {
+        throw new Error(result.error)
+      }
+
+      setPublishStep('Product created! Uploading image...')
       
-      // Save to localStorage for demo purposes
-      const existingProducts = JSON.parse(localStorage.getItem('publishedProducts') || '[]')
-      existingProducts.push({ ...publishData, id: Date.now() })
-      localStorage.setItem('publishedProducts', JSON.stringify(existingProducts))
+      // Upload image after product creation (non-blocking)
+      if (imageFile && result.success && 'productId' in result && result.productId) {
+        const productId = result.productId as string;
+        compressImage(imageFile)
+          .then(compressedImage => 
+            productService.uploadProductImage(compressedImage, user.uid, productId)
+          )
+          .then(imageResult => {
+            if (imageResult.success && imageResult.imageUrl) {
+              // Update product with image URL asynchronously
+              productService.updateProduct(productId, { imageUrl: imageResult.imageUrl });
+            }
+          })
+          .catch(error => {
+            console.error('Image processing/upload error:', error);
+            // Image upload failed but product is already created
+          });
+      }
+
+      // Product is already created, proceed immediately
+      setPublishStep('Success!')
       
-      alert('🎉 Product published successfully! Your craft is now live on the marketplace.')
+      // Clear cache to ensure products page shows latest data
+      if (typeof window !== 'undefined') {
+        // Force a cache invalidation by setting a flag
+        localStorage.setItem('productsCacheInvalid', Date.now().toString());
+      }
       
-      // Optional: Navigate to product view or marketplace
-      // router.push('/marketplace')
-    } catch (error) {
+      showToast({
+        type: 'success',
+        title: 'Product Published!',
+        message: 'Your craft is now live on the marketplace.'
+      })
+      
+      // Navigate immediately for better UX
+      router.push('/products')
+      
+    } catch (error: any) {
       console.error('Publishing error:', error)
-      alert('❌ Failed to publish product. Please try again.')
+      showToast({
+        type: 'error',
+        title: 'Publishing Failed',
+        message: error.message || 'An unexpected error occurred while publishing your product'
+      })
     } finally {
-      setIsSaving(false)
+      setIsPublishing(false)
+      setPublishStep('')
     }
   }
 
@@ -427,10 +607,18 @@ export default function InstantProductListing() {
       
       localStorage.setItem('productDrafts', JSON.stringify(existingDrafts))
       
-      alert('💾 Draft saved successfully! You can continue editing later.')
+      showToast({
+        type: 'success',
+        title: 'Draft Saved',
+        message: 'Your product draft has been saved successfully!'
+      })
     } catch (error) {
       console.error('Save draft error:', error)
-      alert('❌ Failed to save draft. Please try again.')
+      showToast({
+        type: 'error',
+        title: 'Save Failed',
+        message: 'Failed to save draft. Please try again.'
+      })
     } finally {
       setIsSaving(false)
     }
@@ -477,6 +665,14 @@ export default function InstantProductListing() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
+              <Button 
+                onClick={() => router.push('/dashboard')}
+                variant="ghost" 
+                size="sm"
+                className="text-sm"
+              >
+                🏠 Dashboard
+              </Button>
               <Button variant="ghost" size="sm" className="rounded-full w-8 h-8 p-0">
                 ?
               </Button>
@@ -574,6 +770,118 @@ export default function InstantProductListing() {
               hasExistingContent={!!productData.description.trim()}
             />
 
+            {/* Story Section */}
+            <div className="mb-6">
+              <div 
+                className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg cursor-pointer hover:from-purple-100 hover:to-blue-100 transition-colors"
+                onClick={() => setStoryExpanded(!storyExpanded)}
+              >
+                <div className="flex items-center space-x-2">
+                  <span className="text-lg">📖</span>
+                  <h3 className="font-semibold text-gray-800">Craft Story</h3>
+                  {productData.story && (
+                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                      Story Added
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs text-gray-500">
+                    {storyExpanded ? 'Click to collapse' : 'Click to expand'}
+                  </span>
+                  <svg 
+                    className={`w-5 h-5 text-gray-500 transition-transform ${storyExpanded ? 'transform rotate-180' : ''}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+
+              {storyExpanded && (
+                <div className="mt-3 p-4 border border-gray-200 rounded-lg bg-white">
+                  {/* Image Preview in Story Section */}
+                  {imagePreview && (
+                    <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Your Craft Image</h4>
+                      <img 
+                        src={imagePreview} 
+                        alt="Your craft" 
+                        className="w-full max-w-xs mx-auto h-32 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="mb-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Artisan Story
+                    </label>
+                    <p className="text-xs text-gray-500 mb-3">
+                      Tell the story behind your craft - your journey, inspiration, and the tradition behind this piece.
+                    </p>
+                    <textarea
+                      value={productData.story || ''}
+                      onChange={(e) => setProductData(prev => ({ ...prev, story: e.target.value }))}
+                      placeholder="Share the story behind this beautiful piece... your inspiration, the techniques used, or the cultural significance..."
+                      className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      onClick={generateAIStory}
+                      disabled={isGeneratingStory}
+                      variant="outline"
+                      className="flex items-center space-x-2"
+                    >
+                      {isGeneratingStory ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                          <span>Generating...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>✨</span>
+                          <span>Generate AI Story</span>
+                        </>
+                      )}
+                    </Button>
+
+                    <Button
+                      onClick={navigateToStoryBuilder}
+                      variant="outline"
+                      className="flex items-center space-x-2"
+                    >
+                      <span>🛠️</span>
+                      <span>Story Builder</span>
+                    </Button>
+
+                    {productData.story && (
+                      <Button
+                        onClick={() => setProductData(prev => ({ ...prev, story: '' }))}
+                        variant="outline"
+                        className="flex items-center space-x-2 text-red-600 hover:text-red-700"
+                      >
+                        <span>🗑️</span>
+                        <span>Clear Story</span>
+                      </Button>
+                    )}
+                  </div>
+
+                  {productData.story && (
+                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                      <p className="text-xs text-gray-600 mb-2">Preview:</p>
+                      <p className="text-sm text-gray-800 leading-relaxed">
+                        {productData.story}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Global Shipping */}
             <div className="mb-4">
               <div className="flex items-center space-x-2 mb-2">
@@ -670,15 +978,15 @@ export default function InstantProductListing() {
                 <Button 
                   className="bg-orange-500 hover:bg-orange-600 flex-1"
                   onClick={handlePublish}
-                  disabled={isSaving}
+                  disabled={isSaving || isPublishing}
                 >
-                  {isSaving ? (
+                  {isPublishing ? (
                     <div className="flex items-center">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Publishing...
+                      {publishStep || 'Publishing...'}
                     </div>
                   ) : (
-                    '📤 Publish Product'
+                    '� Publish Product'
                   )}
                 </Button>
               </div>

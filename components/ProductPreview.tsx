@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import NextImage from 'next/image'
 import { Button } from '@/components/ui/button'
 import { ProductData, ViewMode } from '@/types/product'
@@ -10,6 +10,8 @@ interface ProductPreviewProps {
 }
 
 export default function ProductPreview({ productData, activeView, onViewChange }: ProductPreviewProps) {
+  const [showStoryInPreview, setShowStoryInPreview] = useState(false)
+
   return (
     <div className="h-fit">
       <div className="flex justify-between items-center mb-4">
@@ -109,6 +111,37 @@ export default function ProductPreview({ productData, activeView, onViewChange }
               </span>
             )}
           </p>
+
+          {/* Story Section in Preview */}
+          {productData.story && (
+            <div className="mb-3">
+              <div 
+                className="flex items-center justify-between p-2 bg-purple-50 rounded-lg cursor-pointer hover:bg-purple-100 transition-colors"
+                onClick={() => setShowStoryInPreview(!showStoryInPreview)}
+              >
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm">📖</span>
+                  <span className="text-sm font-medium text-purple-800">Artisan's Story</span>
+                </div>
+                <svg 
+                  className={`w-4 h-4 text-purple-600 transition-transform ${showStoryInPreview ? 'transform rotate-180' : ''}`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              
+              {showStoryInPreview && (
+                <div className="mt-2 p-3 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
+                  <p className="text-sm text-gray-700 leading-relaxed italic">
+                    "{productData.story}"
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
           
           <div className="flex flex-wrap gap-1.5 mb-3">
             {productData.tags.length > 0 ? (
@@ -136,6 +169,12 @@ export default function ProductPreview({ productData, activeView, onViewChange }
                 <span className="text-red-500 mr-1">❤️</span>
                 <span>24 likes</span>
               </div>
+              {productData.story && (
+                <div className="flex items-center">
+                  <span className="text-purple-600 mr-1">📖</span>
+                  <span>Has story</span>
+                </div>
+              )}
             </div>
             <Button size="sm" className="bg-orange-500 hover:bg-orange-600 font-semibold px-4">
               Add to Cart
@@ -154,6 +193,11 @@ export default function ProductPreview({ productData, activeView, onViewChange }
           <div className="flex items-center justify-center">
             <span className="mr-2">✅</span>
             <span className="font-medium text-xs">Ready to publish!</span>
+            {productData.story && (
+              <span className="ml-2 text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                + Story
+              </span>
+            )}
           </div>
         ) : (
           <div className="flex items-center justify-center">

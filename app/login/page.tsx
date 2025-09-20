@@ -2,32 +2,79 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, User, Sparkles, ArrowRight } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
+import { authService } from "../../backend/firebase/authService";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: ""
   });
 
-  function handleSubmit(e: React.FormEvent) {
+  // Redirect if already logged in - moved to useEffect
+  useEffect(() => {
+    if (user) {
+      setIsRedirecting(true);
+      router.push("/dashboard");
+    }
+  }, [user, router]);
+
+  // Show loading spinner while redirecting
+  if (isRedirecting || user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting to dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!formData.email || (!isSignUp && !formData.password) || (isSignUp && (!formData.name || !formData.password))) return;
     
-    // Save name to localStorage for dashboard
-    if (isSignUp && formData.name) {
-      localStorage.setItem("artisanName", formData.name);
-    } else if (!isSignUp) {
-      localStorage.setItem("artisanName", formData.email.split('@')[0]);
+    setLoading(true);
+    setError("");
+
+    try {
+      if (isSignUp) {
+        await authService.signUp(formData.email, formData.password, formData.name);
+      } else {
+        await authService.signIn(formData.email, formData.password);
+      }
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "An error occurred");
+    } finally {
+      setLoading(false);
     }
-    
-    router.push("/dashboard");
+  }
+
+  async function handleGoogleSignIn() {
+    setLoading(true);
+    setError("");
+
+    try {
+      await authService.signInWithGoogle();
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -101,6 +148,16 @@ export default function LoginPage() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm"
+                >
+                  {error}
+                </motion.div>
+              )}
+
               {isSignUp && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
@@ -118,6 +175,7 @@ export default function LoginPage() {
                       onChange={e => setFormData({...formData, name: e.target.value})}
                       placeholder="Enter your full name"
                       required={isSignUp}
+                      disabled={loading}
                     />
                   </div>
                 </motion.div>
@@ -134,6 +192,7 @@ export default function LoginPage() {
                     onChange={e => setFormData({...formData, email: e.target.value})}
                     placeholder="Enter your email"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -148,11 +207,13 @@ export default function LoginPage() {
                     onChange={e => setFormData({...formData, password: e.target.value})}
                     placeholder={isSignUp ? "Create a password" : "Enter your password"}
                     required
+                    disabled={loading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    disabled={loading}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -171,10 +232,11 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 rounded-xl text-lg font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 rounded-xl text-lg font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 <Sparkles className="mr-2 w-5 h-5" />
-                {isSignUp ? "Create Account" : "Sign In"}
+                {loading ? "Loading..." : isSignUp ? "Create Account" : "Sign In"}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </form>
@@ -191,19 +253,12 @@ export default function LoginPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full py-3 border-2 border-gray-200 hover:border-gray-300 rounded-xl font-medium flex items-center justify-center gap-3"
+                onClick={handleGoogleSignIn}
+                disabled={loading}
+                className="w-full py-3 border-2 border-gray-200 hover:border-gray-300 rounded-xl font-medium flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-                Continue with Google
-              </Button>
-              
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full py-3 border-2 border-gray-200 hover:border-gray-300 rounded-xl font-medium flex items-center justify-center gap-3"
-              >
-                <img src="https://github.com/favicon.ico" alt="GitHub" className="w-5 h-5" />
-                Continue with GitHub
+                {loading ? "Loading..." : "Continue with Google"}
               </Button>
             </div>
 
