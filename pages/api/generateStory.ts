@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import fetch from "node-fetch";
+
 const IncomingForm = require("formidable").IncomingForm;
 import fs from "fs";
 
@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const form = new IncomingForm();
-  form.parse(req, async (err, fields, files) => {
+  form.parse(req, async (err: any, fields: { [key: string]: any }, files: { [key: string]: any }) => {
     if (err) {
       return res.status(500).json({ error: "Image upload failed" });
     }

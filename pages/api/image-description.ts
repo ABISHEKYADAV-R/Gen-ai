@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 const IncomingForm = require("formidable").IncomingForm;
 import fs from "fs";
-import fetch from "node-fetch";
 
 export const config = {
   api: {
