@@ -8,7 +8,7 @@ export const config = {
   },
 };
 
-const VISION_API_KEY = "AIzaSyBQAUxG8BmJN4wXsYZ6kw3T7fg_ZvZPJOs";
+const VISION_API_KEY = "AIzaSyCrZEbvt6bT2-pHE-Ty8CrOjZ7kxCG8D2I";
 
 async function getImageDescription(imagePath: string): Promise<string> {
   const imageData = fs.readFileSync(imagePath, { encoding: "base64" });
