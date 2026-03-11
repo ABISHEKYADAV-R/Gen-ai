@@ -9,8 +9,8 @@ export const config = {
   },
 };
 
-const GEMINI_API_KEY = "AIzaSyCrZEbvt6bT2-pHE-Ty8CrOjZ7kxCG8D2I";
-const VISION_API_KEY = "AIzaSyCrZEbvt6bT2-pHE-Ty8CrOjZ7kxCG8D2I";
+const GEMINI_API_KEY = process.env.GOOGLE_AI_API_KEY || "AIzaSyAqaWfkb4WnOIwGljHJfgfx9XR_M8FXXlQ";
+const VISION_API_KEY = process.env.GOOGLE_AI_API_KEY || "AIzaSyAqaWfkb4WnOIwGljHJfgfx9XR_M8FXXlQ";
 
 async function getImageDescription(imagePath: string): Promise<string> {
   const imageData = fs.readFileSync(imagePath, { encoding: "base64" });
@@ -72,7 +72,7 @@ Example structure:
 
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -111,7 +111,7 @@ Example structure:
 
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

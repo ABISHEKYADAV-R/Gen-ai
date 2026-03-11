@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, UploadCloud, Edit3, RotateCcw, Image as ImageIcon, BookOpen, Wand2, Lightbulb, Trash2, ShoppingCart } from "lucide-react";
 
 export default function StoryBuilder() {
   const router = useRouter();
@@ -101,261 +103,343 @@ export default function StoryBuilder() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
+    <div className="min-h-screen pt-24 pb-16 px-6 relative overflow-hidden flex flex-col items-center">
+      {/* Background Ambience */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-[120px] mix-blend-multiply animate-pulse-slow -z-10"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/20 rounded-full blur-[120px] mix-blend-multiply animate-pulse-slow font-delay-2000 -z-10"></div>
+
+      <div className="max-w-6xl w-full mx-auto relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
           <div className="flex justify-between items-center mb-6">
-            <div></div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              ✨ Artisan Story Builder
-            </h1>
             <Button 
               onClick={() => router.push('/dashboard')}
-              variant="ghost" 
-              className="text-sm"
+              variant="outline" 
+              className="glass-card hover:bg-white/40 border-white/40 shadow-sm transition-all"
             >
-              🏠 Dashboard
+              ← Back to Dashboard
             </Button>
+            <div className="w-[120px]"></div> {/* Spacer for centering */}
           </div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Share your authentic crafting journey - the inspiration, challenges, and passion behind your unique creations
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center justify-center p-3 mb-6 rounded-3xl glass-card border-white/40 shadow-xl"
+          >
+            <div className="bg-gradient-to-tr from-primary to-accent p-3 rounded-2xl mr-4 shadow-inner">
+              <Sparkles className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight pr-4">
+              Story <span className="text-gradient">Forge</span>
+            </h1>
+          </motion.div>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium">
+            Merge your creative process with AI logic. Generate authentic, high-converting lore for your next masterpiece.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="flex gap-8">
+        <div className="grid lg:grid-cols-12 gap-8 items-start">
           {/* Left: Form */}
-          <div className="bg-white rounded-xl shadow-lg p-8 flex-1 max-w-md">
-            <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
-              <h3 className="font-semibold text-purple-800 mb-2">💡 Story Tips</h3>
-              <ul className="text-sm text-purple-700 space-y-1">
-                <li>• Share what inspired this piece</li>
-                <li>• Describe your crafting process</li>
-                <li>• Mention challenges you overcame</li>
-                <li>• Explain what makes it special</li>
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="lg:col-span-5 w-full glass rounded-[2.5rem] p-8 shadow-2xl border-white/30 relative overflow-hidden"
+          >
+            {/* Subtle inner noise */}
+            <div className="absolute inset-0 bg-[url('/images/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none"></div>
+
+            <div className="mb-8 p-5 bg-primary/5 rounded-2xl border border-primary/20 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700 pointer-events-none"></div>
+              <h3 className="font-bold text-primary flex items-center mb-3 text-lg">
+                <Lightbulb className="w-5 h-5 mr-2" />
+                Context Framework
+              </h3>
+              <ul className="text-sm text-foreground/80 space-y-2 font-medium">
+                <li className="flex items-start"><span className="text-primary mr-2">•</span> Origin of materials</li>
+                <li className="flex items-start"><span className="text-primary mr-2">•</span> Historical techniques used</li>
+                <li className="flex items-start"><span className="text-primary mr-2">•</span> Emotional state during creation</li>
               </ul>
             </div>
 
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <span className="mr-2">🎨</span>
-              Your Craft Story
+            <h2 className="text-2xl font-black mb-6 flex items-center text-foreground">
+              <Edit3 className="w-6 h-6 mr-3 text-accent" />
+              Input Variables
             </h2>
             
-            <label className="block mb-2 font-medium">Share Your Journey</label>
-            <p className="text-sm text-gray-600 mb-3">
-              Tell us about your inspiration, the materials you chose, and the process of creating this piece...
-            </p>
-            <textarea
-              className="w-full border rounded-lg p-4 mb-4 resize-none h-32 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="Example: I was inspired by the morning light filtering through my studio window. I chose clay from the local riverbank because of its unique texture. The biggest challenge was achieving the perfect glaze - it took three attempts before I got the color just right..."
-              value={storyIdea}
-              onChange={e => setStoryIdea(e.target.value)}
-            />
-
-            <label className="block mb-2 font-medium">Upload Craft Image</label>
-            <div className="mb-4">
-              <label className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 cursor-pointer text-gray-500 hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 mb-2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4m0 0V8m0 4h4m-4 0H8m8 4a4 4 0 10-8 0 4 4 0 008 0z" />
-                </svg>
-                <span className="text-center">
-                  <span className="font-medium">Click to upload</span> or drag and drop
-                </span>
-                <span className="text-xs mt-1 text-center">
-                  All image formats supported: JPG, PNG, JPEG, GIF, BMP, WEBP, SVG, TIFF
-                </span>
-                <span className="text-xs text-gray-400">Max size: 10MB</span>
-                <input 
-                  type="file" 
-                  accept="image/*,.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg,.tiff,.tif" 
-                  className="hidden" 
-                  onChange={handleImageUpload} 
+            <div className="space-y-6 relative z-10">
+              <div>
+                <label className="block mb-2 font-semibold text-foreground/90 text-sm tracking-wide uppercase">Raw Concept</label>
+                <textarea
+                  className="w-full bg-white/50 dark:bg-black/20 border border-white/30 rounded-2xl p-5 resize-none h-32 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all font-medium placeholder:text-muted-foreground/50 shadow-inner block"
+                  placeholder="e.g. Forged this blade using reclaimed suspension springs. Took 14 hours over 3 days. Wanted an aggressive but elegant profile."
+                  value={storyIdea}
+                  onChange={e => setStoryIdea(e.target.value)}
                 />
-              </label>
-              {image && (
-                <div className="mt-3">
-                  {/* Image Preview */}
-                  <div className="mb-3 p-2 bg-gray-50 border border-gray-200 rounded-lg">
-                    <div className="relative">
-                      {imagePreview ? (
-                        <img 
-                          src={imagePreview} 
-                          alt="Uploaded craft" 
-                          className="w-full h-48 object-cover rounded-lg"
-                        />
-                      ) : (
-                        <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                          <p className="text-gray-500">No image uploaded</p>
+              </div>
+
+              <div>
+                <label className="block mb-2 font-semibold text-foreground/90 text-sm tracking-wide uppercase flex items-center justify-between">
+                  <span>Visual Reference</span>
+                  <span className="text-xs text-muted-foreground font-medium normal-case">Optional but recommended</span>
+                </label>
+                <div className="relative group">
+                  <label className="flex flex-col items-center justify-center border-2 border-dashed border-primary/30 rounded-2xl p-8 cursor-pointer text-muted-foreground bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 relative overflow-hidden w-full">
+                    {/* Hover reveal */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    
+                    <UploadCloud className="w-10 h-10 mb-3 text-primary group-hover:scale-110 transition-transform duration-300 relative z-10" />
+                    <span className="text-center relative z-10">
+                      <span className="font-bold text-foreground">Click to upload</span> or drag and drop
+                    </span>
+                    <span className="text-xs mt-2 text-center text-muted-foreground relative z-10 font-medium">
+                      High-res images yield better AI context
+                    </span>
+                    <input 
+                      type="file" 
+                      accept="image/*,.jpg,.jpeg,.png,.webp" 
+                      className="hidden" 
+                      onChange={handleImageUpload} 
+                    />
+                  </label>
+                </div>
+              </div>
+              <AnimatePresence>
+                {image && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, height: "auto", scale: 1 }}
+                    exit={{ opacity: 0, height: 0, scale: 0.95 }}
+                    className="overflow-hidden"
+                  >
+                    {/* Image Preview */}
+                    <div className="p-2 bg-white/40 dark:bg-black/30 border border-white/20 rounded-2xl mt-4 relative group">
+                      <div className="relative w-full h-48 rounded-xl overflow-hidden bg-muted flex items-center justify-center">
+                        {imagePreview ? (
+                          <img 
+                            src={imagePreview} 
+                            alt="Uploaded craft" 
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                        ) : (
+                          <ImageIcon className="w-10 h-10 text-muted-foreground/30 animate-pulse" />
+                        )}
+                        <button
+                          onClick={() => {
+                            setImage(null); 
+                            setImagePreview(null);
+                            setImageDesc("");
+                          }}
+                          className="absolute top-3 right-3 bg-black/50 hover:bg-red-500 backdrop-blur-md text-white p-2 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0"
+                          title="Remove image"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      
+                      {/* Attached File Meta */}
+                      <div className="mt-3 px-2 flex justify-between items-center bg-white/50 dark:bg-black/20 p-2 rounded-lg border border-white/20">
+                        <div className="flex items-center space-x-2 truncate">
+                          <ImageIcon className="w-4 h-4 text-primary flex-shrink-0" />
+                          <span className="text-xs font-bold text-foreground truncate">{image.name}</span>
                         </div>
-                      )}
-                      <button
-                        onClick={() => {
-                          setImage(null); 
-                          setImagePreview(null);
-                          setImageDesc("");
-                        }}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {/* File Info */}
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-green-600">📷</span>
-                        <span className="text-sm font-medium text-green-800">{image.name}</span>
-                        <span className="text-xs text-green-600">
-                          ({(image.size / 1024 / 1024).toFixed(1)}MB)
+                        <span className="text-[10px] font-black uppercase text-muted-foreground bg-foreground/5 px-2 py-1 rounded-md ml-2 flex-shrink-0">
+                          {(image.size / 1024 / 1024).toFixed(1)}MB
                         </span>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        {imageDescLoading && (
-                          <div className="flex items-center space-x-1 text-xs text-blue-600">
-                            <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            <span>Analyzing image...</span>
-                          </div>
-                        )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {image && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="relative"
+                >
+                  <label className="block mb-2 font-semibold text-foreground/90 text-sm tracking-wide uppercase flex items-center justify-between">
+                    <span>Parsed Vision Data</span>
+                    {imageDescLoading && (
+                      <span className="flex items-center text-xs text-accent font-bold">
+                        <svg className="animate-spin -ml-1 mr-2 h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Analyzing Structure
+                      </span>
+                    )}
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full bg-white/50 dark:bg-black/20 border border-white/30 rounded-xl p-3 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all font-medium text-sm disabled:opacity-70 disabled:cursor-not-allowed shadow-inner"
+                    placeholder="Vision API override description..."
+                    value={imageDesc}
+                    onChange={e => setImageDesc(e.target.value)}
+                    disabled={imageDescLoading}
+                  />
+                </motion.div>
+              )}
+
+              <div>
+                <label className="block mb-2 font-semibold text-foreground/90 text-sm tracking-wide uppercase">Narrative Vector</label>
+                <div className="relative">
+                  <select
+                    className="w-full bg-white/50 dark:bg-black/20 border border-white/30 rounded-xl p-4 appearance-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all font-bold text-foreground cursor-pointer shadow-inner"
+                    value={storyTone}
+                    onChange={e => setStoryTone(e.target.value)}
+                  >
+                    <option value="Inspirational" className="font-semibold text-black">✨ Inspirational & Uplifting</option>
+                    <option value="Ancestral" className="font-semibold text-black">🏛️ Ancestral & Heritage</option>
+                    <option value="Minimalist" className="font-semibold text-black">📐 Minimalist & Modern</option>
+                    <option value="Mystical" className="font-semibold text-black">🌙 Mystical & Esoteric</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-muted-foreground">
+                    ▼
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <Button 
+                  className="w-full h-14 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-xl hover:shadow-primary/30 rounded-2xl font-black text-lg transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group" 
+                  onClick={handleGenerateStory}
+                  disabled={loading}
+                >
+                  <div className="absolute inset-0 bg-white/20 -skew-x-12 translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-700"></div>
+                  {loading ? (
+                    <span className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Synthesizing Narrative...
+                    </span>
+                  ) : (
+                    <span className="flex items-center">
+                      <Wand2 className="mr-2 w-5 h-5" /> Execute Generation
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right: Output */}
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            className="lg:col-span-7 w-full flex flex-col"
+          >
+            <div className="glass rounded-[2.5rem] p-8 shadow-2xl border-white/30 relative overflow-hidden flex-1 flex flex-col">
+              <div className="flex justify-between items-center border-b border-border pb-6 mb-6">
+                <h2 className="text-2xl font-black flex items-center text-foreground">
+                  <BookOpen className="w-6 h-6 mr-3 text-primary" />
+                  Rendered Output
+                </h2>
+                {image && imagePreview && (
+                  <span className="inline-flex items-center text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">
+                    <ImageIcon className="w-3 h-3 mr-1" /> Bound to Image
+                  </span>
+                )}
+              </div>
+              
+              <div className={`rounded-2xl flex-1 flex flex-col relative overflow-hidden transition-all duration-500 ${generatedStory ? 'bg-white/40 dark:bg-black/20 border border-white/20' : 'bg-transparent border-2 border-dashed border-border flex items-center justify-center min-h-[400px]'}`}>
+                
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center p-12 w-full h-full min-h-[400px]">
+                    <div className="relative w-24 h-24 mb-8">
+                      <div className="absolute inset-0 rounded-full border-4 border-primary/20"></div>
+                      <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Sparkles className="w-8 h-8 text-primary animate-pulse" />
                       </div>
                     </div>
+                    <span className="font-black text-xl text-foreground mb-2">Compiling Lore...</span>
+                    <span className="text-sm font-medium text-muted-foreground text-center max-w-xs animate-pulse">Running advanced linguistic models across cultural datasets</span>
                   </div>
-                </div>
-              )}
-            </div>
-
-            <label className="block mb-2 font-medium">Image Description</label>
-            <div className="relative">
-              <input
-                type="text"
-                className="w-full border rounded-lg p-3 mb-4 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder={imageDescLoading ? "Analyzing image..." : "Describe your craft (e.g. 'hand-carved wooden sculpture')"}
-                value={imageDesc}
-                onChange={e => setImageDesc(e.target.value)}
-                disabled={imageDescLoading}
-              />
-              {imageDescLoading && (
-                <div className="absolute right-3 top-3">
-                  <svg className="animate-spin h-5 w-5 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                </div>
-              )}
-            </div>
-
-            <label className="block mb-2 font-medium">Story Tone</label>
-            <select
-              className="w-full border rounded-lg p-3 mb-6 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              value={storyTone}
-              onChange={e => setStoryTone(e.target.value)}
-            >
-              <option>Inspirational</option>
-              <option>Humorous</option>
-              <option>Emotional</option>
-              <option>Educational</option>
-            </select>
-
-            <Button 
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700" 
-              onClick={handleGenerateStory}
-              disabled={loading}
-            >
-              {loading ? "Crafting Your Story..." : "Generate Artisan Story"}
-            </Button>
-          </div>
-
-          {/* Right: Generated Story */}
-          <div className="bg-white rounded-xl shadow-lg p-8 flex-1">
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <span className="mr-2">📖</span>
-              Your Generated Story
-              {image && imagePreview && (
-                <span className="ml-auto text-sm text-gray-500">with image</span>
-              )}
-            </h2>
-            
-            {/* Image Preview in Story Section */}
-            {image && imagePreview && !loading && (
-              <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                <img 
-                  src={imagePreview} 
-                  alt="Your craft" 
-                  className="w-full max-w-sm mx-auto h-40 object-cover rounded-lg"
-                />
-                <p className="text-center text-sm text-gray-600 mt-2">
-                  {imageDesc || "Your craft image"}
-                </p>
-              </div>
-            )}
-            
-            <div className="bg-gray-100 rounded-lg p-6 min-h-[200px] flex items-center justify-center text-gray-500">
-              {loading ? (
-                <div className="flex flex-col items-center animate-pulse">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 mb-2 text-purple-600 animate-spin">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  </svg>
-                  <span className="font-medium">Crafting your authentic artisan story...</span>
-                  <span className="text-xs mt-1">Including challenges and creation process</span>
-                </div>
-              ) : generatedStory ? (
-                isEditing ? (
-                  <textarea
-                    className="w-full border rounded-lg p-4 h-40 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                    value={generatedStory}
-                    onChange={e => setGeneratedStory(e.target.value)}
-                  />
+                ) : generatedStory ? (
+                  <div className="p-6 md:p-8 flex flex-col h-full overflow-hidden">
+                    {/* Inline Image Thumbnail alongside text */}
+                    {image && imagePreview && (
+                      <div className="mb-6 float-left mr-6 hidden sm:block">
+                        <div className="w-32 h-32 rounded-xl overflow-hidden shadow-lg border-2 border-white/50 bg-muted">
+                          <img src={imagePreview} alt="Output attached" className="w-full h-full object-cover" />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {isEditing ? (
+                      <textarea
+                        className="w-full h-full min-h-[300px] flex-1 border border-primary/30 rounded-xl p-5 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 resize-none bg-white font-medium text-foreground leading-relaxed shadow-inner"
+                        value={generatedStory}
+                        onChange={e => setGeneratedStory(e.target.value)}
+                      />
+                    ) : (
+                      <div className="w-full flex-1 overflow-y-auto pr-2 custom-scrollbar pb-6 relative z-10">
+                        <p className="text-foreground/90 font-medium leading-loose whitespace-pre-wrap text-lg first-letter:text-5xl first-letter:font-black first-letter:text-primary first-letter:mr-1 first-letter:float-left first-line:tracking-widest first-line:uppercase">
+                          {generatedStory}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 ) : (
-                  <div className="w-full text-left">
-                    <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">{generatedStory}</p>
+                  <div className="flex flex-col items-center text-center p-8 max-w-sm">
+                    <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mb-6">
+                      <BookOpen className="w-10 h-10 text-muted-foreground" />
+                    </div>
+                    <span className="font-bold text-xl mb-3 text-foreground">Waiting for Input</span>
+                    <span className="text-sm font-medium text-muted-foreground leading-relaxed">
+                      Provider your baseline context and run the generator to craft a rich, market-ready narrative here.
+                    </span>
                   </div>
-                )
-              ) : (
-                <div className="flex flex-col items-center text-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 mb-3 text-gray-400">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m-6-8h6" />
-                  </svg>
-                  <span className="font-medium mb-2">Your artisan story will appear here</span>
-                  <span className="text-sm text-gray-400 max-w-xs">
-                    Share your journey, upload an image, and let AI craft an authentic story about your creation process
-                  </span>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            <div className="flex gap-4 mt-6">
-              <Button 
-                variant="outline" 
-                className="flex-1" 
-                onClick={handleEdit} 
-                disabled={!generatedStory || loading}
-              >
-                ✏️ Edit Story
-              </Button>
-              <Button 
-                variant="outline" 
-                className="flex-1" 
-                onClick={handleRegenerate} 
-                disabled={!generatedStory || loading}
-              >
-                🔄 Regenerate
-              </Button>
-            </div>
+              {/* Action Bar */}
+              <AnimatePresence>
+                {generatedStory && !loading && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-8 pt-6 border-t border-border"
+                  >
+                    <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1 rounded-xl font-bold border-2 hover:bg-white/50" 
+                        onClick={handleEdit} 
+                      >
+                        <Edit3 className="w-4 h-4 mr-2" />
+                        {isEditing ? 'Save Edits' : 'Manual Tweak'}
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="flex-1 rounded-xl font-bold border-2 hover:bg-white/50" 
+                        onClick={handleRegenerate} 
+                      >
+                        <RotateCcw className="w-4 h-4 mr-2" />
+                        Reroll Variant
+                      </Button>
+                    </div>
 
-            <Button 
-              className="w-full mt-4 bg-green-600 hover:bg-green-700 font-semibold" 
-              onClick={handleUpdateStory} 
-              disabled={!generatedStory || loading}
-            >
-              <span className="mr-2">✨</span>
-              Update Story in Product Listing
-            </Button>
-          </div>
+                    <Button 
+                      className="w-full rounded-xl bg-foreground text-background hover:bg-foreground/90 font-black text-lg py-7 shadow-xl hover:-translate-y-1 transition-transform" 
+                      onClick={handleUpdateStory} 
+                    >
+                      <ShoppingCart className="w-5 h-5 mr-3" />
+                      Deploy to Storefront Layout →
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>

@@ -12,9 +12,9 @@ export default function LandingPage() {
   return (
     <div className="font-sans">
       {/* Navbar */}
-      <header className="flex justify-between items-center px-6 py-3 shadow-md fixed top-0 left-0 right-0 bg-white z-50">
-        <div className="text-xl font-bold text-purple-600">CraftAI</div>
-        <nav className="space-x-6 text-gray-700 hidden md:flex">
+      <header className="flex justify-between items-center px-6 py-4 fixed top-0 left-0 right-0 z-50 glass">
+        <div className="text-2xl font-black text-gradient">CraftAI</div>
+        <nav className="space-x-8 text-foreground/80 hidden md:flex font-medium">
           {[
             { name: "Home", target: "top" },
             { name: "Features", target: "features" },
@@ -24,7 +24,7 @@ export default function LandingPage() {
             <a
               key={item.name}
               href={"#" + item.target}
-              className="relative transition-colors duration-200 hover:text-purple-600 group"
+              className="relative transition-colors duration-200 hover:text-primary group"
               onClick={(e) => {
                 e.preventDefault();
                 const offset = 72; // height of navbar (px)
@@ -33,240 +33,254 @@ export default function LandingPage() {
                 } else {
                   const el = document.getElementById(item.target);
                   if (el) {
-                    // For "Pricing", scroll to the CTA section, not the image
-                    if (item.target === "cta") {
-                      const y =
-                        el.getBoundingClientRect().top +
-                        window.scrollY -
-                        offset;
-                      window.scrollTo({ top: y, behavior: "smooth" });
-                    } else {
-                      const y =
-                        el.getBoundingClientRect().top +
-                        window.scrollY -
-                        offset;
-                      window.scrollTo({ top: y, behavior: "smooth" });
-                    }
+                    const y = el.getBoundingClientRect().top + window.scrollY - offset;
+                    window.scrollTo({ top: y, behavior: "smooth" });
                   }
                 }
               }}>
               {item.name}
-              <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-purple-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></span>
+              <span className="absolute left-0 -bottom-2 w-full h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></span>
             </a>
           ))}
         </nav>
-        <div className="space-x-2">
+        <div className="space-x-3">
           <Button
             variant="ghost"
-            className="px-3 py-1 text-sm"
+            className="px-4 py-2 hover:bg-primary/10 transition-colors"
             onClick={() => router.push("/login")}>
             Sign In
           </Button>
           <Button
-            className="bg-purple-600 text-white px-4 py-1 text-sm"
+            className="bg-primary hover:bg-primary/90 text-white px-5 py-2 shadow-lg hover:shadow-primary/25 transition-all"
             onClick={() => router.push("/login")}>
             Get Started
           </Button>
         </div>
       </header>
       {/* Hero Section */}
-      <section className="relative px-10 pt-24 pb-20 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="relative grid md:grid-cols-2 gap-16 max-w-7xl mx-auto items-center">
+      <section className="relative px-6 md:px-10 pt-32 pb-24 overflow-hidden min-h-screen flex items-center">
+        {/* Dynamic Backgrounds */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] mix-blend-multiply animate-pulse-slow"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/20 rounded-full blur-[120px] mix-blend-multiply animate-pulse-slow font-delay-2000"></div>
+
+        <div className="relative grid md:grid-cols-2 gap-16 max-w-7xl mx-auto items-center w-full">
           <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0, filter: "blur(10px)", y: 20 }}
+            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className="flex flex-col justify-center"
           >
-            <div className="mb-8">
+            <div className="mb-6">
               <motion.span 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
-                className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold text-lg shadow-lg"
+                className="inline-flex items-center px-4 py-2 rounded-full glass-card border-primary/30 text-primary font-semibold text-sm shadow-md"
               >
-                <Sparkles className="mr-3 w-5 h-5" />
-                AI-Powered Craft Platform
+                <Sparkles className="mr-2 w-4 h-4 animate-shimmer" />
+                Next-Gen Craft Selling Platform
               </motion.span>
             </div>
+            
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="text-6xl md:text-7xl font-black leading-tight mb-8"
+              transition={{ delay: 0.3 }}
+              className="text-6xl md:text-[5rem] font-black leading-[1.1] tracking-tight mb-8 text-foreground"
             >
-              Transform Your{" "}
-              <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent">
-                Craft
-              </span>{" "}
-              Into Global Success
+              Elevate Your <br/>
+              <span className="text-gradient">
+                Craftsmanship
+              </span>
             </motion.h1>
+            
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="text-xl text-gray-700 mb-10 max-w-2xl leading-relaxed"
+              transition={{ delay: 0.4 }}
+              className="text-xl text-muted-foreground mb-10 max-w-xl leading-relaxed"
             >
-              Empower artisans with AI storytelling, smart commerce tools, and
-              global marketplace access. Turn your passion into profit with zero technical skills required.
+              Merge tradition with future commerce. Craft AI-generated stories that resonate globally, and launch premium storefronts in seconds.
             </motion.p>
+            
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="flex flex-col sm:flex-row gap-6"
+              transition={{ delay: 0.5 }}
+              className="flex flex-col sm:flex-row gap-5"
             >
               <Button 
                 onClick={() => router.push("/login")}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-10 py-6 rounded-2xl text-xl font-bold shadow-2xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-7 rounded-2xl text-lg font-bold shadow-xl hover:shadow-primary/30 transform hover:-translate-y-1 transition-all duration-300"
               >
-                <Sparkles className="mr-3 w-6 h-6" />
-                Start Selling Now
+                <Sparkles className="mr-2 w-5 h-5" />
+                Start Your Journey
               </Button>
               <Button
                 variant="outline"
-                className="border-2 border-purple-300 text-purple-700 hover:bg-purple-50 px-10 py-6 rounded-2xl text-xl font-bold hover:border-purple-400 transition-all duration-300"
+                className="glass-card text-foreground hover:bg-white/40 border-white/40 px-8 py-7 rounded-2xl text-lg font-bold transition-all duration-300"
               >
-                <ArrowRight className="mr-3 w-6 h-6" />
-                Watch Demo
+                <ArrowRight className="mr-2 w-5 h-5 text-primary" />
+                View Gallery
               </Button>
             </motion.div>
             <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="flex items-center gap-8 mt-12"
+              initial={{ opacity: 0, filter: "blur(10px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              transition={{ delay: 0.7 }}
+              className="flex items-center gap-6 mt-12"
             >
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  <img src="/images/maya-profile.jpg" alt="User" className="w-10 h-10 rounded-full border-2 border-white" />
-                  <img src="/images/sarah-avatar.jpg" alt="User" className="w-10 h-10 rounded-full border-2 border-white" />
-                  <img src="/images/hero-image.jpg" alt="User" className="w-10 h-10 rounded-full border-2 border-white object-cover" />
-                  <div className="w-10 h-10 rounded-full border-2 border-white bg-purple-500 flex items-center justify-center text-white text-sm font-bold">+2K</div>
-                </div>
-                <span className="text-gray-600 font-medium">2,000+ artisans</span>
+              <div className="flex -space-x-3">
+                <img src="/images/maya-profile.jpg" alt="User" className="w-12 h-12 rounded-full border-2 border-background object-cover shadow-sm" />
+                <img src="/images/sarah-avatar.jpg" alt="User" className="w-12 h-12 rounded-full border-2 border-background object-cover shadow-sm" />
+                <div className="w-12 h-12 rounded-full border-2 border-background bg-primary/10 flex items-center justify-center text-primary text-xs font-bold shadow-sm backdrop-blur-md">+2K</div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex text-yellow-400">
-                  {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-current" />)}
+              <div className="flex flex-col">
+                <span className="text-foreground font-semibold">2,000+ artisans online</span>
+                <div className="flex items-center text-yellow-500 gap-1 text-sm mt-0.5">
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <span className="text-muted-foreground ml-1">4.9/5 Average rating</span>
                 </div>
-                <span className="text-gray-600 font-medium">4.9/5 rating</span>
               </div>
             </motion.div>
           </motion.div>
 
+          {/* Hero Floating Card */}
           <motion.div 
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.9, x: 20 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="flex items-center justify-center relative"
           >
-            <div className="relative">
-              <motion.div
-                whileHover={{ scale: 1.05, rotate: 2 }}
-                className="relative z-10"
-              >
-                <Card className="rounded-3xl shadow-2xl bg-white border-0 overflow-hidden">
-                  <div className="w-full h-80 bg-gradient-to-br from-amber-50 to-orange-100 overflow-hidden">
-                    <img
-                      src="/images/hero-image.jpg"
-                      alt="Beautiful ceramic art"
-                      className="object-cover w-full h-full"
-                    />
+            <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-accent/20 blur-3xl rounded-[3rem] -z-10 animate-pulse-slow"></div>
+            <motion.div
+              className="relative w-full max-w-md animate-float"
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            >
+              <Card className="rounded-[2rem] shadow-2xl glass border-white/30 overflow-hidden transform-gpu">
+                <div className="relative w-full h-72 overflow-hidden group">
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors z-10 duration-500"></div>
+                  <img
+                    src="/images/hero-image.jpg"
+                    alt="Premium Ceramic"
+                    className="object-cover w-full h-full transform transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute top-4 right-4 z-20 glass-card px-3 py-1.5 rounded-full flex items-center gap-1.5 text-sm font-medium">
+                    <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
+                    4.9
                   </div>
-                  <CardContent className="p-8">
-                    <div className="flex items-center gap-3 mb-3">
-                      <img src="/images/maya-profile.jpg" alt="Maya" className="w-12 h-12 rounded-full" />
-                      <div>
-                        <h3 className="font-bold text-xl">Maya's Ceramic Art</h3>
-                        <p className="text-gray-500">Ceramic Artist from Indonesia</p>
-                      </div>
-                    </div>
-                    <p className="text-gray-600 mb-6 leading-relaxed">
-                      Hand-crafted with 200+ years of family tradition, each piece tells a story of heritage and artistry.
+                </div>
+                <CardContent className="p-6 relative">
+                  <div className="absolute -top-10 left-6">
+                    <img src="/images/maya-profile.jpg" alt="Maya" className="w-16 h-16 rounded-2xl border-4 border-white shadow-lg object-cover" />
+                  </div>
+                  
+                  <div className="mt-8 mb-2">
+                    <h3 className="font-bold text-2xl text-foreground">Obsidian Ceramic Bowl</h3>
+                    <p className="text-muted-foreground text-sm flex items-center gap-1 mt-1">
+                      Maya <span className="w-1 h-1 rounded-full bg-primary mx-1"></span> Jakarta, ID
                     </p>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="font-black text-3xl text-purple-600">$89</span>
-                      <div className="flex items-center gap-2 text-yellow-500">
-                        <Star className="w-6 h-6 fill-current" />
-                        <span className="font-bold text-xl">4.9</span>
-                      </div>
+                  </div>
+                  
+                  <p className="text-sm text-foreground/80 leading-relaxed mb-6">
+                    Molded from volcanic clay across 3 days, blending ancestral heritage with modern minimalist form. 
+                  </p>
+                  
+                  <div className="pt-4 border-t border-border flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-semibold">Value</p>
+                      <span className="font-black text-2xl text-gradient">$145</span>
                     </div>
-                    <div className="flex items-center gap-3 text-green-600 font-semibold">
-                      <Globe className="w-5 h-5" />
-                      Ships globally • In stock
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              {/* Decorative elements */}
-              <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full opacity-20 blur-xl"></div>
-              <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full opacity-20 blur-xl"></div>
-            </div>
+                    <Button className="rounded-xl px-6 bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all">
+                      Acquire Piece
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+            
+            {/* Small floating accents */}
+            <motion.div 
+              className="absolute -right-8 top-12 glass-card rounded-2xl p-4 shadow-xl animate-float-delayed hidden md:flex"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.8 }}
+            >
+              <Globe className="w-6 h-6 text-accent mr-3" />
+              <div>
+                <p className="text-xs font-bold text-muted-foreground uppercase">Global Reach</p>
+                <p className="text-sm font-semibold">12 Countries</p>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* Features */}
-      <section id="features" className="py-24 px-10 bg-white">
-        <div className="max-w-7xl mx-auto">
+      <section id="features" className="py-24 px-6 md:px-10 relative">
+        <div className="max-w-7xl mx-auto z-10 relative">
           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, filter: "blur(10px)", y: 30 }}
+            whileInView={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
             className="text-center mb-20"
           >
-            <h2 className="text-5xl font-black mb-6 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Heritage Meets Technology
+            <h2 className="text-4xl md:text-5xl font-black mb-6 text-foreground tracking-tight">
+              Design <span className="text-transparent bg-clip-text bg-[linear-gradient(to_right,var(--color-primary),var(--color-accent))]">Intelligence</span>
             </h2>
-            <p className="text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              Our AI-powered platform bridges traditional craftsmanship with modern
-              commerce, creating unlimited opportunities for artisans worldwide.
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              We replace complex technical hurdles with invisible AI. A seamless suite that scales your artisan business beautifully.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: <Sparkles className="w-12 h-12 text-white" />,
-                title: "AI Storytelling",
-                description: "Transform simple product photos and voice notes into compelling stories that connect with global buyers.",
-                features: ["Voice-to-story conversion", "Multi-language support", "Cultural context awareness"],
-                color: "from-purple-500 to-purple-700"
+                icon: <Sparkles className="w-8 h-8 text-primary group-hover:text-white transition-colors" />,
+                title: "Contextual Lore",
+                description: "Turn sparse voice notes or quick snaps into cinematic narratives that anchor emotional value.",
+                features: ["Tone adjustment", "Heritage context", "SEO optimized"],
+                highlight: "bg-primary/10 group-hover:bg-primary"
               },
               {
-                icon: <ShoppingCart className="w-12 h-12 text-white" />,
-                title: "Smart Commerce",
-                description: "Auto-generated storefronts with integrated payments, shipping, and marketing campaigns.",
-                features: ["Instant storefront creation", "Global payment processing", "Automated marketing"],
-                color: "from-orange-500 to-red-500"
+                icon: <ShoppingCart className="w-8 h-8 text-accent group-hover:text-white transition-colors" />,
+                title: "Frictionless Store",
+                description: "Stunning one-click storefronts deployed globally without writing a single line of backend logic.",
+                features: ["Instant checkouts", "Inventory sync", "Dynamic pricing"],
+                highlight: "bg-accent/10 group-hover:bg-accent"
               },
               {
-                icon: <Globe className="w-12 h-12 text-white" />,
-                title: "Global Reach",
-                description: "Connect with buyers worldwide through our curated marketplace and recommendation engine.",
-                features: ["AI-powered recommendations", "International shipping", "Cultural authenticity badges"],
-                color: "from-pink-500 to-rose-500"
+                icon: <Globe className="w-8 h-8 text-orange-500 group-hover:text-white transition-colors" />,
+                title: "Borderless Exchange",
+                description: "Automatically translate stories, handle currencies, and manage international fulfillment routes.",
+                features: ["Auto-translations", "Currency conversion", "Customs prep"],
+                highlight: "bg-orange-500/10 group-hover:bg-orange-500"
               }
             ].map((feature, idx) => (
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: idx * 0.2 }}
-                whileHover={{ y: -10 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: idx * 0.15 }}
+                className="group h-full"
               >
-                <Card className="p-10 h-full bg-gradient-to-br from-white to-gray-50 border-2 border-gray-100 hover:border-purple-200 hover:shadow-2xl transition-all duration-300">
-                  <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-8 shadow-lg`}>
+                <Card className="p-8 h-full glass-card hover:bg-white/60 dark:hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 group-hover:shadow-2xl group-hover:shadow-primary/10 border-white/20">
+                  <div className={`w-16 h-16 rounded-2xl ${feature.highlight} flex items-center justify-center mb-8 transition-all duration-500`}>
                     {feature.icon}
                   </div>
-                  <h3 className="font-black text-2xl mb-4">{feature.title}</h3>
-                  <p className="text-gray-600 mb-8 text-lg leading-relaxed">{feature.description}</p>
-                  <ul className="space-y-4">
+                  <h3 className="font-bold text-2xl mb-4 text-foreground">{feature.title}</h3>
+                  <p className="text-muted-foreground mb-8 line-clamp-3 leading-relaxed">{feature.description}</p>
+                  
+                  <ul className="space-y-3 mt-auto border-t border-border pt-6">
                     {feature.features.map((item, i) => (
-                      <li key={i} className="flex items-center text-gray-700 font-medium">
-                        <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                      <li key={i} className="flex items-center text-sm font-medium text-foreground/80">
+                        <Check className="w-4 h-4 text-primary mr-3 flex-shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -280,222 +294,275 @@ export default function LandingPage() {
       {/* Dashboard Section */}
       <section
         id="dashboard"
-        className="py-10 px-4 md:px-10 flex flex-col items-center">
-        <h2 className="text-4xl font-bold text-center mb-1">
-          Simple Dashboard for Artisans
-        </h2>
-        <p className="text-lg text-gray-600 text-center mb-6">
-          Upload your craft, let AI create your story, and watch sales grow
-          globally
-        </p>
-        <div className="w-full max-w-4xl">
-          <div className="rounded-2xl shadow-xl overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-6 flex justify-between items-center">
-              <div className="flex items-center">
+        className="py-24 px-6 md:px-10 flex flex-col items-center relative"
+      >
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-gradient-to-r from-primary/10 to-accent/10 blur-[100px] -z-10 rounded-full"></div>
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-black mb-4 text-foreground">
+            Your Artisan <span className="text-gradient">Command Center</span>
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Upload a photo, let our AI weave the story, and track your global empire from a single elegant interface.
+          </p>
+        </motion.div>
+
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95, y: 30 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.8 }}
+          className="w-full max-w-5xl"
+        >
+          <div className="rounded-[2.5rem] shadow-2xl glass border border-white/20 overflow-hidden transform-gpu">
+            {/* Dashboard Header Mock */}
+            <div className="bg-gradient-to-r from-primary to-accent border-b border-white/10 px-8 py-6 flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-[url('/images/noise.png')] opacity-10 mix-blend-overlay"></div>
+              <div className="flex items-center relative z-10">
                 <img
                   src="/images/maya-profile.jpg"
                   alt="Maya profile"
-                  className="w-12 h-12 rounded-full border-2 border-white mr-4"
+                  className="w-14 h-14 rounded-2xl border-2 border-white/30 mr-4 shadow-lg object-cover"
                 />
                 <div>
-                  <div className="text-white font-semibold">
-                    Welcome back, Maya!
+                  <div className="text-white font-bold text-lg tracking-tight">
+                    Maya's Studio
                   </div>
-                  <div className="text-white text-sm opacity-80">
-                    Ceramic Artist from Indonesia
+                  <div className="text-white/80 text-sm font-medium">
+                    Level 4 Artisan • Premium
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-3xl font-bold text-white">$2,847</div>
-                <div className="text-white text-sm opacity-80">
-                  This month's earnings
+              <div className="sm:text-right flex sm:block items-center justify-between w-full sm:w-auto relative z-10">
+                <div className="text-white/80 text-sm font-medium mb-1">
+                  Rolling 30 Days
                 </div>
+                <div className="text-4xl font-black text-white">$4,289<span className="text-xl text-white/60 font-medium">.00</span></div>
               </div>
             </div>
-            <div className="bg-white px-8 py-8 grid md:grid-cols-3 gap-8">
+
+            {/* Dashboard Body Mock */}
+            <div className="bg-white/50 dark:bg-black/20 px-8 py-10 grid md:grid-cols-3 gap-8">
               {/* Quick Upload */}
-              <div>
-                <div className="font-semibold mb-3 flex items-center gap-2">
-                  <img
-                    src="/images/upload-icon.png"
-                    alt="Upload"
-                    className="w-5 h-5"
-                  />
-                  Quick Upload
-                </div>
-                <div className="border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center py-8">
-                  <img
-                    src="/images/camera-icon.png"
-                    alt="Camera"
-                    className="w-10 h-10 mb-2 opacity-60"
-                  />
-                  <div className="text-gray-500 mb-2">
-                    Take a photo of your craft
+              <div className="glass-card rounded-3xl p-6 hover:-translate-y-1 transition-transform duration-300">
+                <div className="font-bold mb-4 flex items-center gap-2 text-foreground">
+                  <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+                    <Sparkles className="w-4 h-4" />
                   </div>
-                  <a href="#" className="text-purple-600 font-semibold">
-                    Choose Image
-                  </a>
+                  New Listing
+                </div>
+                <div className="border-2 border-dashed border-primary/30 bg-primary/5 rounded-2xl flex flex-col items-center justify-center py-10 cursor-pointer hover:bg-primary/10 hover:border-primary/50 transition-colors group">
+                  <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                  </div>
+                  <div className="text-foreground font-semibold">
+                    Upload Craft Photo
+                  </div>
+                  <div className="text-muted-foreground text-sm mt-1">PNG, JPG up to 10MB</div>
                 </div>
               </div>
+
               {/* AI Generated Story */}
-              <div>
-                <div className="font-semibold mb-3 flex items-center gap-2">
-                  <img
-                    src="/images/story-icon.png"
-                    alt="Story"
-                    className="w-5 h-5"
-                  />
-                  AI Generated Story
+              <div className="glass-card rounded-3xl p-6 hover:-translate-y-1 transition-transform duration-300">
+                <div className="font-bold mb-4 flex items-center gap-2 text-foreground">
+                  <div className="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center text-accent">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                  </div>
+                  Active Generation
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-gray-700 text-sm mb-2">
-                  "This beautiful ceramic bowl carries the wisdom of my
-                  grandmother's hands, shaped by centuries of Javanese pottery
-                  traditions..."
+                <div className="bg-background rounded-2xl p-5 text-foreground text-sm mb-4 border border-border shadow-inner relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-accent"></div>
+                  "This obsidian ceramic bowl carries the weight of volcanic earth, shaped by centuries of ancestral Javanese pottery traditions passed down through four generations..."
                 </div>
-                <div className="flex justify-between items-center text-xs text-gray-400">
-                  <span>Generated in 3 seconds</span>
-                  <a href="#" className="text-purple-600 font-semibold">
-                    Edit Story
+                <div className="flex justify-between items-center px-1">
+                  <span className="text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-md">Draft Ready</span>
+                  <a href="#" className="text-primary font-bold text-sm hover:underline">
+                    Review & Publish →
                   </a>
                 </div>
               </div>
+
               {/* Performance */}
-              <div>
-                <div className="font-semibold mb-3 flex items-center gap-2">
-                  <img
-                    src="/images/performance-icon.png"
-                    alt="Performance"
-                    className="w-5 h-5"
-                  />
-                  <span className="text-pink-500">Performance</span>
+              <div className="glass-card rounded-3xl p-6 hover:-translate-y-1 transition-transform duration-300">
+                <div className="font-bold mb-6 flex items-center gap-2 text-foreground">
+                  <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-500">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                  </div>
+                  Global Analytics
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-gray-600">
-                    <span>Products Listed</span>
-                    <span className="font-bold text-gray-900">24</span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Global Views</span>
-                    <span className="font-bold text-gray-900">1,847</span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Sales This Week</span>
-                    <span className="font-bold text-green-500">+18</span>
-                  </div>
+                <div className="space-y-4">
+                  {[
+                    { label: "Active Listings", value: "24", change: "+2" },
+                    { label: "Store Views", value: "12.4K", change: "+14%" },
+                    { label: "Conversion Rate", value: "3.2%", change: "+0.8%" }
+                  ].map((stat, i) => (
+                    <div key={i} className="flex justify-between items-center p-3 rounded-xl hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
+                      <span className="text-muted-foreground font-medium">{stat.label}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="font-black text-foreground">{stat.value}</span>
+                        <span className="text-xs font-bold text-green-500 bg-green-50 dark:bg-green-500/10 px-1.5 py-0.5 rounded">{stat.change}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
       {/* Marketplace */}
-      <section id="marketplace" className="py-10 px-10 bg-gray-50 text-center">
-        <h2 className="text-3xl font-bold mb-1">Global Marketplace</h2>
-        <p className="text-gray-500 text-lg mb-6">
-          Discover authentic crafts from artisans around the world
-        </p>
-        <div className="grid md:grid-cols-4 gap-6">
-          {[
-            {
-              name: "Traditional Ikat Textile",
-              price: "$145",
-              img: "/images/ikat-textile.jpg",
-              subtitle: "By Sari from Bali",
-              rating: 4.8,
-              contain: false,
-            },
-            {
-              name: "Hand-Carved Sculpture",
-              price: "$289",
-              img: "/images/hand-carved-sculpture.jpg",
-              subtitle: "By Carlos from Mexico",
-              rating: 4.9,
-              contain: true,
-            },
-            {
-              name: "Silver Bead Necklace",
-              price: "$67",
-              img: "/images/silver-bead-necklace.jpg",
-              subtitle: "By Amara from Morocco",
-              rating: 4.7,
-              contain: false,
-            },
-            {
-              name: "Woven Storage Basket",
-              price: "$34",
-              img: "/images/woven-storage-basket.jpg",
-              subtitle: "By Kemi from Ghana",
-              rating: 5.0,
-              contain: false,
-            },
-          ].map((item, idx) => (
-            <motion.div key={idx} whileHover={{ scale: 1.05 }}>
-              <Card className="shadow-md rounded-2xl overflow-hidden relative bg-white">
-                <div className="w-full aspect-[4/3] bg-gray-100 flex items-center justify-center overflow-hidden">
-                  <img
-                    src={item.img}
-                    alt={item.name}
-                    className={
-                      item.contain
-                        ? "object-contain w-full h-full"
-                        : "object-cover w-full h-full"
-                    }
-                  />
-                </div>
-                <CardContent className="pt-4 pb-2 px-4">
-                  <h3 className="font-semibold text-lg text-left">
-                    {item.name}
-                  </h3>
-                  <p className="text-gray-500 text-left text-sm">
-                    {item.subtitle}
-                  </p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="font-bold text-xl">{item.price}</span>
-                    <span className="flex items-center gap-1 text-yellow-500 font-medium text-sm">
-                      <svg
-                        width="18"
-                        height="18"
-                        fill="currentColor"
-                        viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.175 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.174 9.393c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.966z" />
-                      </svg>
-                      {item.rating}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+      <section id="marketplace" className="py-24 px-6 md:px-10 bg-background relative border-t border-border">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="text-left"
+            >
+              <h2 className="text-4xl font-black mb-3 text-foreground">Featured Collections</h2>
+              <p className="text-muted-foreground text-lg max-w-xl">
+                Discover pieces with rich histories, sourced directly from master artisans globally.
+              </p>
             </motion.div>
-          ))}
+            <Button variant="ghost" className="hidden md:flex items-center text-primary font-bold hover:bg-primary/10">
+              Explore Gallery <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                name: "Ceremonial Ikat Textile",
+                price: "$145",
+                img: "/images/ikat-textile.jpg",
+                subtitle: "Sari • Bali, ID",
+                rating: 4.8,
+              },
+              {
+                name: "Obsidian Root Sculpture",
+                price: "$289",
+                img: "/images/hand-carved-sculpture.jpg",
+                subtitle: "Carlos • Oaxaca, MX",
+                rating: 4.9,
+              },
+              {
+                name: "Nomadic Silver Heirloom",
+                price: "$167",
+                img: "/images/silver-bead-necklace.jpg",
+                subtitle: "Amara • Marrakech, MA",
+                rating: 5.0,
+              },
+              {
+                name: "Savannah Storage Basket",
+                price: "$84",
+                img: "/images/woven-storage-basket.jpg",
+                subtitle: "Kemi • Accra, GH",
+                rating: 4.9,
+              },
+            ].map((item, idx) => (
+              <motion.div 
+                key={idx} 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                className="group cursor-pointer"
+              >
+                <Card className="shadow-sm hover:shadow-2xl rounded-[2rem] overflow-hidden bg-card border-border transition-all duration-500 hover:-translate-y-2 relative h-full flex flex-col">
+                  {/* Subtle hover gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none"></div>
+                  
+                  <div className="w-full aspect-[4/5] bg-muted overflow-hidden relative">
+                    <img
+                      src={item.img}
+                      alt={item.name}
+                      className="object-cover w-full h-full transform transition-transform duration-700 group-hover:scale-110"
+                    />
+                    {/* Floating Add to Cart on hover */}
+                    <div className="absolute bottom-4 left-0 w-full flex justify-center opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-20">
+                      <Button className="bg-white text-black hover:bg-gray-100 rounded-full shadow-lg px-6 font-bold">
+                        Quick View
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <CardContent className="p-5 flex-grow flex flex-col justify-between relative z-20 bg-card">
+                    <div>
+                      <div className="flex justify-between items-start mb-1">
+                        <p className="text-muted-foreground text-xs font-semibold track-wider uppercase">{item.subtitle}</p>
+                        <span className="flex items-center gap-1 text-yellow-500 font-bold text-xs bg-yellow-500/10 px-1.5 py-0.5 rounded">
+                          <Star className="w-3 h-3 fill-current" />
+                          {item.rating}
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-lg text-foreground leading-tight group-hover:text-primary transition-colors">
+                        {item.name}
+                      </h3>
+                    </div>
+                    
+                    <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                      <span className="font-black text-xl text-foreground">{item.price}</span>
+                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-foreground group-hover:bg-primary group-hover:text-white transition-colors">
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+          
+          <div className="mt-12 text-center md:hidden">
+            <Button variant="outline" className="w-full rounded-xl py-6 font-bold border-2">
+              Explore Gallery
+            </Button>
+          </div>
         </div>
-        <Button className="mt-6 bg-purple-600 text-white px-6 py-3 rounded-xl text-lg">
-          Explore All Products
-        </Button>
       </section>
       {/* CTA */}
       <section
         id="cta"
-        className="py-10 px-10 text-center bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-        <h2 className="text-4xl font-bold mb-4">
-          Ready to Transform Your Craft?
-        </h2>
-        <p className="text-lg mb-4">
-          Join thousands of artisans already selling globally with AI-powered
-          storytelling.
-        </p>
-        <div className="flex justify-center space-x-6">
-          <Button 
-            className="bg-white text-purple-600 px-6 py-3 rounded-xl text-lg"
-            onClick={() => router.push("/instant-product-listing")}
-          >
-            Start Free Trial
-          </Button>
-          <Button
-            variant="outline"
-            className="border-white text-purple-600 px-6 py-3 rounded-xl text-lg">
-            Schedule Demo
-          </Button>
-        </div>
+        className="py-24 px-6 md:px-10 text-center relative overflow-hidden">
+        {/* Abstract CTA Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-accent to-orange-500 -z-20"></div>
+        <div className="absolute inset-0 bg-[url('/images/noise.png')] opacity-20 mix-blend-overlay -z-10"></div>
+        <div className="absolute top-0 left-1/4 w-[50%] h-full bg-white/10 skew-x-12 -z-10 hidden md:block"></div>
+        
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="max-w-4xl mx-auto glass-card border-white/20 p-12 rounded-[3rem]"
+        >
+          <h2 className="text-4xl md:text-6xl font-black mb-6 text-white tracking-tight">
+            Stop Selling. <br/>Start <span className="text-yellow-300">Storytelling.</span>
+          </h2>
+          <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
+            Join the invitation-only waitlist for elite artisans. Spots are limited as we scale our AI rendering nodes.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button 
+              className="bg-white text-primary hover:bg-gray-50 px-8 py-7 rounded-2xl text-lg font-bold shadow-xl transition-transform hover:-translate-y-1"
+              onClick={() => router.push("/login")}
+            >
+              Request Access
+            </Button>
+            <Button
+              variant="outline"
+              className="border-2 border-white/50 text-white hover:bg-white/10 px-8 py-7 rounded-2xl text-lg font-bold transition-colors"
+            >
+              Contact Curators
+            </Button>
+          </div>
+        </motion.div>
       </section>
     </div>
   );
