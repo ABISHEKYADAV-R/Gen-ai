@@ -4,9 +4,10 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
   Sparkles, ShoppingBag, Globe, Star, ArrowRight,
-  Paintbrush, Wand2, TrendingUp, Check, Menu, X, ChevronRight
+  Paintbrush, Wand2, TrendingUp, Check, Menu, X, ChevronRight, Loader2
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { productService, ProductData } from "../backend/firebase/productService";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -21,6 +22,21 @@ const stagger = {
 export default function LandingPage() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [liveProducts, setLiveProducts] = useState<ProductData[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    const fetchMarketplace = async () => {
+      try {
+        const res = await productService.getPublishedProducts(8);
+        if (res.success && res.products && res.products.length > 0) {
+          setLiveProducts(res.products);
+        }
+      } catch (err) {}
+      setIsLoadingProducts(false);
+    };
+    fetchMarketplace();
+  }, []);
 
   const navLinks = [
     { name: "Features", href: "#features" },
@@ -435,33 +451,44 @@ export default function LandingPage() {
 
           <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
             style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24 }}>
-            {[
-              { id: "mock-1", name: "Traditional Ikat Textile", price: "$145", artist: "Sari · Bali", emoji: "🧣", rating: 4.8, sales: 142, category: "Textiles" },
-              { id: "mock-2", name: "Hand-Carved Deity Sculpture", price: "$289", artist: "Carlos · Oaxaca", emoji: "🗿", rating: 4.9, sales: 87, category: "Sculpture" },
-              { id: "mock-3", name: "Silver Filigree Necklace", price: "$67", artist: "Amara · Fes", emoji: "💎", rating: 4.7, sales: 203, category: "Jewelry" },
-              { id: "mock-4", name: "Woven Storage Basket", price: "$34", artist: "Kemi · Accra", emoji: "🧺", rating: 5.0, sales: 318, category: "Weaving" },
-            ].map((item, i) => (
-              <motion.div key={i} variants={fadeUp}
+            {isLoadingProducts ? (
+              <div style={{ gridColumn: "1 / -1", display: "flex", justifyContent: "center", padding: "40px 0" }}>
+                <Loader2 className="w-8 h-8 animate-spin text-[#C2600A]" />
+              </div>
+            ) : (liveProducts.length > 0 ? liveProducts : [
+              { id: "mock-1", title: "Traditional Ikat Textile", price: 145, createdBy: "Sari · Bali", emoji: "🧣", rating: 4.8, views: 142, category: "Textiles" },
+              { id: "mock-2", title: "Hand-Carved Deity Sculpture", price: 289, createdBy: "Carlos · Oaxaca", emoji: "🗿", rating: 4.9, views: 87, category: "Sculpture" },
+              { id: "mock-3", title: "Silver Filigree Necklace", price: 67, createdBy: "Amara · Fes", emoji: "💎", rating: 4.7, views: 203, category: "Jewelry" },
+              { id: "mock-4", title: "Woven Storage Basket", price: 34, createdBy: "Kemi · Accra", emoji: "🧺", rating: 5.0, views: 318, category: "Weaving" },
+            ]).map((item: any, i) => (
+              <motion.div key={item.id} variants={fadeUp}
                 onClick={() => router.push(`/product/${item.id}`)}
                 className="hover-lift"
                 style={{ background: "#fff", borderRadius: 16, overflow: "hidden", border: "1px solid rgba(28,20,16,0.08)", cursor: "pointer" }}>
                 <div style={{
                   height: 200, display: "flex", alignItems: "center", justifyContent: "center",
-                  background: `linear-gradient(135deg, hsl(${25 + i * 30}, 40%, 18%) 0%, hsl(${30 + i * 25}, 50%, 25%) 100%)`,
+                  background: item.imageUrl ? "#E8E1D7" : `linear-gradient(135deg, hsl(${25 + i * 30}, 40%, 18%) 0%, hsl(${30 + i * 25}, 50%, 25%) 100%)`,
                   position: "relative",
+                  overflow: "hidden"
                 }}>
-                  <span style={{ fontSize: 64 }}>{item.emoji}</span>
-                  <span style={{ position: "absolute", top: 14, left: 14, padding: "4px 10px", borderRadius: 6, background: "rgba(0,0,0,0.4)", color: "#fff", fontSize: 11, fontWeight: 600 }}>{item.category}</span>
-                  <span style={{ position: "absolute", top: 14, right: 14, padding: "4px 10px", borderRadius: 6, background: "rgba(245,200,66,0.9)", color: "#1C1410", fontSize: 11, fontWeight: 700 }}>{item.price}</span>
+                  {item.imageUrl ? (
+                    <img src={item.imageUrl} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ) : (
+                    <span style={{ fontSize: 64 }}>{item.emoji || "🏺"}</span>
+                  )}
+                  <span style={{ position: "absolute", top: 14, left: 14, padding: "4px 10px", borderRadius: 6, background: "rgba(0,0,0,0.4)", color: "#fff", fontSize: 11, fontWeight: 600 }}>{item.category || "Craft"}</span>
+                  <span style={{ position: "absolute", top: 14, right: 14, padding: "4px 10px", borderRadius: 6, background: "rgba(245,200,66,0.9)", color: "#1C1410", fontSize: 11, fontWeight: 700 }}>
+                    ${Number(item.price).toFixed(2)}
+                  </span>
                 </div>
                 <div style={{ padding: 20 }}>
-                  <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, fontWeight: 700, color: "#1C1410", marginBottom: 6 }}>{item.name}</h3>
-                  <p style={{ fontSize: 13, color: "#7A6A5A", marginBottom: 14 }}>by {item.artist}</p>
+                  <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, fontWeight: 700, color: "#1C1410", marginBottom: 6, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.title}</h3>
+                  <p style={{ fontSize: 13, color: "#7A6A5A", marginBottom: 14, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>by {item.createdBy?.substring(0,10) || "Artisan"}</p>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                       <Star size={13} fill="#F5C842" color="#F5C842" />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: "#3D2E26" }}>{item.rating}</span>
-                      <span style={{ fontSize: 12, color: "#7A6A5A" }}>({item.sales})</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "#3D2E26" }}>{item.rating || 4.9}</span>
+                      <span style={{ fontSize: 12, color: "#7A6A5A" }}>({item.views || 0})</span>
                     </div>
                     <div style={{ width: 32, height: 32, borderRadius: 8, background: "#FDE8D5", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "background 0.2s" }}
                       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#C2600A"; (e.currentTarget.querySelector("svg") as any).style.color = "#fff"; }}

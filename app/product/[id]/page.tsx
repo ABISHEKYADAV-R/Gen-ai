@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useToast } from "../../../lib/ToastContext";
 import { productService, ProductData } from "../../../backend/firebase/productService";
-import { ArrowLeft, Heart, Share2, ShoppingCart, Truck, Shield, Star, MapPin, Clock, Tag, Palette, Hammer, Leaf, Sparkles, Globe, User, MessageCircle } from "lucide-react";
+import { ArrowLeft, Heart, Share2, ShoppingCart, Truck, Shield, Star, MapPin, Clock, Tag, Palette, Hammer, Leaf, Sparkles, Globe, User, MessageCircle, X, Send } from "lucide-react";
 import Image from "next/image";
 
 const MOCK_PRODUCTS: Record<string, Partial<ProductData>> = {
@@ -92,6 +92,11 @@ export default function ProductDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
 
+  // Contact Modal State
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
+
   const productId = params?.id as string;
 
   useEffect(() => {
@@ -155,8 +160,40 @@ export default function ProductDetailPage() {
     }
   };
 
-  const handleContact = () => {
-    showToast({ type: "info", title: "Contact Feature", message: "Contact functionality will be available soon!" });
+  const handleContact = (presetMessage = "") => {
+    setContactForm({
+      name: user?.displayName || "",
+      email: user?.email || "",
+      message: presetMessage || `Hi, I am interested in ${product?.title}. Could you provide more details?`
+    });
+    setIsContactModalOpen(true);
+  };
+
+  const handleSubmitInquiry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactForm.name || !contactForm.email || !contactForm.message) {
+      showToast({ type: "error", title: "Missing Fields", message: "Please fill out all fields." });
+      return;
+    }
+
+    setIsSubmitting(true);
+    const result = await productService.submitInquiry({
+      productId: product?.id as string,
+      productName: product?.title as string,
+      customerName: contactForm.name,
+      customerEmail: contactForm.email,
+      message: contactForm.message,
+      artisanId: product?.createdBy
+    });
+
+    setIsSubmitting(false);
+
+    if (result.success) {
+      showToast({ type: "success", title: "Message Sent", message: "The artisan will get back to you soon!" });
+      setIsContactModalOpen(false);
+    } else {
+      showToast({ type: "error", title: "Failed to Send", message: result.error || "An error occurred." });
+    }
   };
 
   if (isLoading) {
@@ -253,7 +290,7 @@ export default function ProductDetailPage() {
                        <div className="text-xs text-[#7A6A5A]">CraftAI Community Member</div>
                      </div>
                    </div>
-                   <button onClick={handleContact} className="text-sm font-semibold text-[#C2600A] flex items-center gap-2 hover:opacity-80 transition-opacity">
+                   <button onClick={() => handleContact()} className="text-sm font-semibold text-[#C2600A] flex items-center gap-2 hover:opacity-80 transition-opacity">
                      <MessageCircle className="w-4 h-4" /> Message
                    </button>
                 </div>
@@ -318,14 +355,14 @@ export default function ProductDetailPage() {
               {/* Actions */}
               <div className="flex flex-col gap-3">
                 <button
-                  onClick={handleContact}
+                  onClick={() => handleContact(`I would like to reserve the ${product.title}. Is it available?`)}
                   className="w-full bg-gradient-to-r from-[#C2600A] to-[#E07B39] text-white py-4 rounded-2xl font-bold shadow-[0_8px_20px_rgba(194,96,10,0.3)] hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(194,96,10,0.4)] transition-all flex items-center justify-center gap-3"
                 >
                   <ShoppingCart className="w-5 h-5" /> Reserve Item
                 </button>
                 {(!user || user.uid !== product.createdBy) && !MOCK_PRODUCTS[product.id as string] && (
                   <button
-                    onClick={handleContact}
+                    onClick={() => handleContact(`I am interested in a custom order similar to ${product.title}.`)}
                     className="w-full bg-white border-2 border-[rgba(28,20,16,0.1)] text-[#1C1410] py-4 rounded-2xl font-bold hover:border-[#1C1410] transition-colors flex items-center justify-center gap-3"
                   >
                     Discuss Custom Order
@@ -406,6 +443,82 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Contact Modal Overlay */}
+      {isContactModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-[#1C1410]/60 backdrop-blur-sm" onClick={() => setIsContactModalOpen(false)}></div>
+          
+          <div className="bg-white rounded-[32px] w-full max-w-lg p-8 relative z-10 shadow-2xl border border-[rgba(28,20,16,0.06)] animate-in fade-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => setIsContactModalOpen(false)}
+              className="absolute top-6 right-6 p-2 rounded-full hover:bg-[#F5F0EB] text-[#7A6A5A] transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-[#FDE8D5] flex items-center justify-center">
+                <MessageCircle className="w-5 h-5 text-[#C2600A]" />
+              </div>
+              <div>
+                <h3 className="font-craft text-2xl font-bold text-[#1C1410]">Contact Artisan</h3>
+                <p className="text-sm text-[#7A6A5A]">Send an inquiry about {product.title}</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmitInquiry} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-sm font-bold text-[#1C1410] mb-1.5">Your Name</label>
+                <input 
+                  type="text" 
+                  required
+                  value={contactForm.name}
+                  onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+                  className="w-full bg-[#F5F0EB] border border-transparent focus:border-[#C2600A]/30 rounded-xl px-4 py-3 text-[15px] outline-none transition-colors"
+                  placeholder="Jane Doe"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-[#1C1410] mb-1.5">Email Address</label>
+                <input 
+                  type="email" 
+                  required
+                  value={contactForm.email}
+                  onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
+                  className="w-full bg-[#F5F0EB] border border-transparent focus:border-[#C2600A]/30 rounded-xl px-4 py-3 text-[15px] outline-none transition-colors"
+                  placeholder="jane@example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-[#1C1410] mb-1.5">Message</label>
+                <textarea 
+                  required
+                  rows={4}
+                  value={contactForm.message}
+                  onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
+                  className="w-full bg-[#F5F0EB] border border-transparent focus:border-[#C2600A]/30 rounded-xl px-4 py-3 text-[15px] outline-none transition-colors resize-none"
+                ></textarea>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full mt-2 bg-gradient-to-r from-[#C2600A] to-[#E07B39] text-white py-4 rounded-xl font-bold shadow-[0_4px_16px_rgba(194,96,10,0.25)] hover:shadow-[0_8px_24px_rgba(194,96,10,0.35)] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:translate-y-0"
+              >
+                {isSubmitting ? (
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                ) : (
+                  <><Send className="w-5 h-5" /> Send Message</>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

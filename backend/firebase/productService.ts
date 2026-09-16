@@ -23,6 +23,16 @@ import {
 } from 'firebase/storage';
 import { db, storage, handleFirebaseError } from '../../lib/firebase.js';
 
+export interface InquiryData {
+  productId: string;
+  productName: string;
+  customerName: string;
+  customerEmail: string;
+  message: string;
+  artisanId?: string;
+  createdAt?: any;
+}
+
 export interface ProductData {
   id?: string;
   title: string;
@@ -451,6 +461,21 @@ export const productService = {
       }
     } catch (error: any) {
       console.error('Error updating views:', error);
+    }
+  },
+
+  // Submit product inquiry
+  async submitInquiry(inquiryData: Omit<InquiryData, 'createdAt'>) {
+    try {
+      await addDoc(collection(db, 'inquiries'), {
+        ...inquiryData,
+        createdAt: serverTimestamp()
+      });
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error submitting inquiry:', error);
+      const { code, message } = handleFirebaseError(error);
+      return { success: false, error: message, code };
     }
   }
 };
