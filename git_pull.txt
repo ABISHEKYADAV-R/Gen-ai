@@ -1,0 +1,16 @@
+From https://github.com/ABISHEKYADAV-R/Gen-ai
+   f272dc6..561ae07  main       -> origin/main
+Auto-merging app/api/generate-story/route.ts
+CONFLICT (content): Merge conflict in app/api/generate-story/route.ts
+Auto-merging app/globals.css
+CONFLICT (content): Merge conflict in app/globals.css
+Auto-merging app/page.tsx
+CONFLICT (content): Merge conflict in app/page.tsx
+Auto-merging app/story-builder/page.tsx
+CONFLICT (content): Merge conflict in app/story-builder/page.tsx
+Auto-merging package-lock.json
+CONFLICT (content): Merge conflict in package-lock.json
+Auto-merging package.json
+CONFLICT (modify/delete): pages/api/generateStory.ts deleted in HEAD and modified in 561ae075b7b503717844e3e26f588f32c1795c20.  Version 561ae075b7b503717844e3e26f588f32c1795c20 of pages/api/generateStory.ts left in tree.
+CONFLICT (modify/delete): pages/api/image-description.ts deleted in HEAD and modified in 561ae075b7b503717844e3e26f588f32c1795c20.  Version 561ae075b7b503717844e3e26f588f32c1795c20 of pages/api/image-description.ts left in tree.
+Automatic merge failed; fix conflicts and then commit the result.

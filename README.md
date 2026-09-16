@@ -26,7 +26,7 @@ CraftAI is a modern marketplace platform that empowers artisans to showcase and 
 
 ## 🚀 Live Demo
 
-**Deployed on Vercel**: https://gen-ai-indol-eta.vercel.app/
+**Deployed on Vercel**: https://craft-gen.vercel.app/
 
 ## 🛠️ Tech Stack
 

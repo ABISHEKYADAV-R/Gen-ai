@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const { storyIdea, storyTone } = await req.json();
-
     if (!storyIdea || !storyTone) {
       return NextResponse.json(
         { error: "Missing storyIdea or storyTone." },
