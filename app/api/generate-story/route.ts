@@ -1,61 +1,90 @@
 import { NextResponse } from "next/server";
+import { GoogleGenAI } from "@google/genai";
 
 export async function POST(req: Request) {
   try {
-    const { storyIdea, storyTone } = await req.json();
+    const formData = await req.formData();
+
+    const storyIdea = formData.get("storyIdea")?.toString().trim();
+    const storyTone = formData.get("storyTone")?.toString().trim();
+    const image = formData.get("image");
+
     if (!storyIdea || !storyTone) {
       return NextResponse.json(
-        { error: "Missing storyIdea or storyTone." },
+        { error: "Missing story idea or story tone." },
         { status: 400 }
       );
     }
 
     const apiKey = process.env.GOOGLE_AI_API_KEY;
+
     if (!apiKey) {
       return NextResponse.json(
-        { error: "Gemini API key is not configured. Set GOOGLE_AI_API_KEY in .env.local" },
+        { error: "Gemini API key is not configured." },
         { status: 500 }
       );
     }
 
-    const prompt = `Write a ${storyTone.toLowerCase()} story for an artisan based on this idea: ${storyIdea}`;
+    const ai = new GoogleGenAI({
+      apiKey,
+    });
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.8,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 400,
-          },
-        }),
-      }
-    );
+    const prompt = `
+You are an expert storyteller for an artisan marketplace called CraftAI.
 
-    const data = await response.json();
+Create a compelling and authentic story for a handmade artisan product.
 
-    if (data.error) {
-      console.error("Gemini API error:", data.error);
-      return NextResponse.json(
-        { error: "Gemini API error", details: data.error.message || data.error },
-        { status: 500 }
-      );
+Story idea:
+${storyIdea}
+
+Tone:
+${storyTone}
+
+Write a warm and engaging artisan story that:
+- Highlights the human craftsmanship
+- Explains the inspiration behind the product
+- Creates an emotional connection with the customer
+- Feels authentic rather than AI-generated
+- Does not invent specific facts that were not provided
+- Is approximately 150-200 words
+
+Return only the story text.
+`;
+
+    const contents: any[] = [{ text: prompt }];
+
+    if (image instanceof File) {
+      const arrayBuffer = await image.arrayBuffer();
+      const base64 = Buffer.from(arrayBuffer).toString("base64");
+
+      contents.push({
+        inlineData: {
+          mimeType: image.type || "image/jpeg",
+          data: base64,
+        },
+      });
     }
 
-    const story =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Story generation failed.";
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents,
+    });
 
-    return NextResponse.json({ story });
-  } catch (err) {
-    console.error("Generate story error:", err);
+    const story = response.text;
+
+    return NextResponse.json({
+      story,
+      imageDescription:
+        image instanceof File ? "Image analyzed by Gemini." : "",
+    });
+  } catch (error) {
+    console.error("Generate story error:", error);
+
     return NextResponse.json(
-      { error: "Failed to generate story." },
+      {
+        error: "Failed to generate story.",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }

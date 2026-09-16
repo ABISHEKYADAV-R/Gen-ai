@@ -85,17 +85,19 @@ export default function ProductImageUpload({
 
   return (
     <div className="mb-6">
-      <div className="flex items-center space-x-2 mb-4">
-        <span>📷</span>
-        <h2 className="text-lg font-semibold">Product Image</h2>
+      <div className="flex items-center space-x-3 mb-6">
+        <div className="w-10 h-10 bg-[#F5F0EB] rounded-full flex items-center justify-center shadow-sm">
+          <span className="text-lg">📷</span>
+        </div>
+        <h2 className="font-craft text-xl font-bold text-[#1C1410]">Craft Imagery</h2>
       </div>
       <div 
-        className={`border-2 border-dashed rounded-lg p-16 text-center bg-gray-50 mb-4 transition-colors ${
+        className={`border-2 border-dashed rounded-[24px] p-16 text-center mb-6 transition-all duration-300 relative overflow-hidden ${
           isDragging 
-            ? 'border-orange-500 bg-orange-50' 
+            ? 'border-[#C2600A] bg-[#FDE8D5]/30' 
             : imageUrl 
-              ? 'border-green-300 bg-green-50' 
-              : 'border-gray-300 hover:border-gray-400'
+              ? 'border-[#166534]/30 bg-[#166534]/5' 
+              : 'border-[#E8E1D7] bg-[#F5F0EB] hover:border-[#C2600A]/50'
         }`}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -116,23 +118,26 @@ export default function ProductImageUpload({
                 variant="secondary"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-white hover:bg-gray-100"
+                className="bg-white/90 hover:bg-white text-[#1C1410] font-bold shadow-lg backdrop-blur-sm"
               >
                 Change Image
               </Button>
             </div>
           </div>
         ) : (
-          <>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white mx-auto mb-4 ${
-              isDragging ? 'bg-orange-600' : 'bg-orange-500'
+          <div className="flex flex-col items-center justify-center">
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-4 shadow-lg transition-transform ${
+              isDragging ? 'bg-gradient-to-br from-[#C2600A] to-[#F5C842] scale-110' : 'bg-gradient-to-br from-[#C2600A] to-[#F5C842]'
             }`}>
-              {isDragging ? '📤' : '☁️'}
+              <span className="text-2xl">{isDragging ? '📥' : '✨'}</span>
             </div>
-            <p className="text-gray-600 mb-4">
-              {isDragging ? 'Drop your image here' : 'Drag & drop your craft image here'}
+            <p className="text-[#3D2E26] font-bold mb-2">
+              {isDragging ? 'Drop your masterpiece here' : 'Drag & Drop Artwork'}
             </p>
-          </>
+            <p className="text-[#7A6A5A] text-sm mb-6 max-w-[250px] mx-auto">
+              High resolution images lead to better AI property detection.
+            </p>
+          </div>
         )}
         <input
           ref={fileInputRef}
@@ -142,64 +147,62 @@ export default function ProductImageUpload({
           className="hidden"
           id="file-upload"
         />
-        <Button 
+        <button 
           onClick={handleButtonClick}
-          className="bg-orange-500 hover:bg-orange-600"
+          className="px-6 py-3 bg-white border border-[#E8E1D7] text-[#3D2E26] font-bold rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all w-fit mx-auto relative z-10"
         >
-          {imageUrl ? '+ Change File' : '+ Choose File'}
-        </Button>
+          {imageUrl ? 'Swap Artwork File' : 'Browse Local Files'}
+        </button>
       </div>
       
       {uploadError && (
-        <div className="bg-red-100 text-red-800 p-3 rounded-lg text-sm mb-4 flex items-center">
-          <span className="mr-2">⚠️</span>
+        <div className="bg-red-50 text-red-800 p-4 rounded-xl text-[13px] font-bold mb-4 flex items-center border border-red-100">
+          <span className="mr-3 text-lg">⚠️</span>
           {uploadError}
         </div>
       )}
       
       {/* AI Analysis Results */}
       {isAnalyzing ? (
-        <div className="bg-blue-100 text-blue-800 p-3 rounded-lg text-sm mb-4 flex items-center">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-3"></div>
-          <span>Analyzing image with AI... Detecting materials, colors, and style...</span>
+        <div className="bg-[#FDE8D5]/50 text-[#C2600A] p-4 rounded-xl text-sm font-bold mb-4 flex items-center border border-[#C2600A]/10">
+          <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#C2600A] border-t-transparent mr-4"></div>
+          <span>Analyzing artwork with AI... Extracting materials & palette...</span>
         </div>
       ) : imageUrl && analysisResult ? (
-        <div className="space-y-3 mb-4">
-          <div className="bg-green-100 text-green-800 p-4 rounded-lg">
-            <div className="flex items-center mb-3">
-              <span className="mr-2">✨</span>
-              <span className="font-semibold">AI Analysis Complete ({Math.round(analysisResult.confidence)}% confident)</span>
+        <div className="space-y-4 mb-4">
+          <div className="bg-[#F5F0EB] p-5 rounded-[24px] border border-[rgba(28,20,16,0.06)]">
+            <div className="flex items-center mb-4">
+              <span className="mr-3 text-xl">✨</span>
+              <span className="font-bold text-[#1C1410]">AI Analysis Complete <span className="text-[#7A6A5A] text-xs uppercase tracking-wider ml-2">({Math.round(analysisResult.confidence)}% match)</span></span>
             </div>
             
-            <div className="grid grid-cols-1 gap-3">
-              {/* Materials Detected */}
+            <div className="grid grid-cols-1 gap-4">
               <div>
-                <span className="font-medium text-green-900">🔍 Materials Detected:</span>
-                <div className="flex flex-wrap gap-1 mt-1">
+                <span className="font-bold text-[11px] text-[#7A6A5A] uppercase tracking-wider mb-2 block">🔍 Discovered Materials</span>
+                <div className="flex flex-wrap gap-2">
                   {analysisResult.materials.map((material, index) => (
-                    <span key={index} className="bg-green-200 text-green-800 px-2 py-1 rounded text-xs">
+                    <span key={index} className="bg-white border border-[#E8E1D7] text-[#3D2E26] font-bold px-3 py-1.5 rounded-lg text-xs shadow-sm">
                       {material}
                     </span>
                   ))}
                 </div>
               </div>
               
-              {/* Colors Detected */}
               <div>
-                <span className="font-medium text-green-900">🎨 Colors:</span>
-                <div className="flex flex-wrap gap-1 mt-1">
+                <span className="font-bold text-[11px] text-[#7A6A5A] uppercase tracking-wider mb-2 block">🎨 Color Palette</span>
+                <div className="flex flex-wrap gap-2">
                   {analysisResult.colors.map((color, index) => (
-                    <span key={index} className="bg-blue-200 text-blue-800 px-2 py-1 rounded text-xs">
+                    <span key={index} className="bg-white border border-[#E8E1D7] text-[#3D2E26] font-bold px-3 py-1.5 rounded-lg text-xs shadow-sm flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full" style={{backgroundColor: color.split(' ')[0]}}></span>
                       {color}
                     </span>
                   ))}
                 </div>
               </div>
               
-              {/* Style Detected */}
               <div>
-                <span className="font-medium text-green-900">🎭 Style:</span>
-                <span className="bg-purple-200 text-purple-800 px-2 py-1 rounded text-xs ml-2">
+                <span className="font-bold text-[11px] text-[#7A6A5A] uppercase tracking-wider mb-2 block">🎭 Aesthetic Style</span>
+                <span className="bg-white border border-[#E8E1D7] text-[#3D2E26] font-bold px-3 py-1.5 rounded-lg text-xs shadow-sm">
                   {analysisResult.style}
                 </span>
               </div>
@@ -207,14 +210,14 @@ export default function ProductImageUpload({
           </div>
         </div>
       ) : imageUrl ? (
-        <div className="bg-yellow-100 text-yellow-800 p-3 rounded-lg text-sm mb-4 flex items-center">
-          <span className="mr-2">⏳</span>
-          <span>Image uploaded successfully! Click "Generate AI Description" to analyze materials.</span>
+        <div className="bg-[#166534]/5 text-[#166534] p-4 rounded-xl text-sm font-bold mb-4 flex items-center border border-[#166534]/20">
+          <span className="mr-3 text-lg">⏳</span>
+          <span>Upload secured! Engage AI Analysis below to extract properties.</span>
         </div>
       ) : (
-        <div className="bg-gray-100 text-gray-600 p-3 rounded-lg text-sm mb-4 flex items-center">
-          <span className="mr-2">📋</span>
-          <span>Upload an image to get AI material analysis and automatic description generation.</span>
+        <div className="bg-[#F5F0EB] text-[#7A6A5A] p-4 rounded-xl text-sm font-bold flex items-center border border-[#E8E1D7]">
+          <span className="mr-3 text-lg">📋</span>
+          <span>Upload imagery to unlock AI material and origin analysis.</span>
         </div>
       )}
     </div>

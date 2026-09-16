@@ -625,7 +625,7 @@ export default function InstantProductListing() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F5F0EB] font-inter text-[#1C1410] pb-20 selection:bg-[#C2600A] selection:text-white">
       {/* Story Imported Notification */}
       {showStoryImportedNotification && (
         <div className="fixed top-4 right-4 bg-green-600 text-white p-3 rounded-lg shadow-lg z-50 flex items-center">
@@ -640,112 +640,104 @@ export default function InstantProductListing() {
         </div>
       )}
       
-      <div className="max-w-7xl mx-auto p-4 lg:p-6">
+      <div className="max-w-7xl mx-auto p-4 lg:p-8 pt-8">
         {/* Header */}
-        <Card className="mb-6 p-4">
+        <div className="mb-8 p-6 bg-white rounded-[32px] shadow-xl shadow-[#1C1410]/5 border border-[rgba(28,20,16,0.06)]">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-4">
               {/* Back Button (show only when coming from story builder) */}
               {searchParams?.get('from') === 'story-builder' && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <button 
                   onClick={() => router.push('/story-builder')}
-                  className="mr-2"
+                  className="flex items-center gap-2 text-[#7A6A5A] hover:text-[#C2600A] font-bold text-sm transition-colors group mr-4"
                 >
-                  ← Back to Story Builder
-                </Button>
+                  <span className="group-hover:-translate-x-1 transition-transform">←</span> Back
+                </button>
               )}
-              <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white">
-                📋
+              <div className="w-12 h-12 bg-gradient-to-br from-[#C2600A] to-[#F5C842] rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <span className="text-xl">✨</span>
               </div>
               <div>
-                <h1 className="text-xl font-semibold">Instant Product Listing</h1>
-                <p className="text-sm text-gray-600">Upload your craft, let AI suggest pricing & descriptions.</p>
+                <h1 className="font-craft text-2xl font-bold text-[#1C1410]">Artisan Studio</h1>
+                <p className="text-[13px] text-[#7A6A5A] font-medium mt-1">Upload your masterpiece, let AI suggest pricing & descriptions.</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Button 
+              <button 
                 onClick={() => router.push('/dashboard')}
-                variant="ghost" 
-                size="sm"
-                className="text-sm"
+                className="px-4 py-2 bg-[#F5F0EB] text-[#3D2E26] text-sm font-bold rounded-xl hover:bg-[#E8E1D7] transition-colors"
               >
-                🏠 Dashboard
-              </Button>
-              <Button variant="ghost" size="sm" className="rounded-full w-8 h-8 p-0">
-                ?
-              </Button>
-              <Button variant="ghost" size="sm" className="rounded-full w-8 h-8 p-0">
-                👤
-              </Button>
+                Dashboard
+              </button>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Panel */}
-          <div className="space-y-4">
-            <Card className="p-4">
-            {/* Product Image Section */}
-            <ProductImageUpload
-              imageUrl={productData.imageUrl}
-              onImageUpload={handleImageUpload}
-              onImageDrop={handleImageDrop}
-              analysisResult={materialAnalysis ? {
-                materials: materialAnalysis.materials,
-                colors: materialAnalysis.colors,
-                style: materialAnalysis.style,
-                confidence: materialAnalysis.confidence
-              } : null}
-              isAnalyzing={isAnalyzingImage}
-            />
+          <div className="lg:col-span-7 space-y-6">
+            
+            <div className="bg-white rounded-[32px] p-6 shadow-xl shadow-[#1C1410]/5 border border-[rgba(28,20,16,0.06)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#FDE8D5] rounded-full blur-3xl opacity-30 -mr-10 -mt-10 pointer-events-none"></div>
+              {/* Product Image Section */}
+              <ProductImageUpload
+                imageUrl={productData.imageUrl}
+                onImageUpload={handleImageUpload}
+                onImageDrop={handleImageDrop}
+                analysisResult={materialAnalysis ? {
+                  materials: materialAnalysis.materials,
+                  colors: materialAnalysis.colors,
+                  style: materialAnalysis.style,
+                  confidence: materialAnalysis.confidence
+                } : null}
+                isAnalyzing={isAnalyzingImage}
+              />
 
-            {/* AI Material Analysis Section */}
-            <MaterialAnalysisSection 
-              analysis={materialAnalysis}
-              isAnalyzing={isAnalyzingImage}
-            />
-            </Card>
+              {/* AI Material Analysis Section */}
+              <MaterialAnalysisSection 
+                analysis={materialAnalysis}
+                isAnalyzing={isAnalyzingImage}
+              />
+            </div>
 
-            <Card className="p-4">
-            {/* AI Materials Detection */}
-            <AIDetectionSection
-              title={productData.title}
-              category={productData.category}
-              isEcoFriendly={productData.isEcoFriendly}
-              onTitleChange={(title) => {
-                setProductData(prev => ({ ...prev, title }))
-                if (validationErrors.title) {
-                  setValidationErrors(prev => ({ ...prev, title: '' }))
-                }
-              }}
-              onCategoryChange={(category) => setProductData(prev => ({ ...prev, category }))}
-              onEcoFriendlyChange={(isEcoFriendly) => setProductData(prev => ({ ...prev, isEcoFriendly }))}
-              errors={validationErrors}
-              materialAnalysis={materialAnalysis}
-              isAnalyzing={isAnalyzingImage}
-            />
-            </Card>
+            <div className="bg-white rounded-[32px] p-6 shadow-xl shadow-[#1C1410]/5 border border-[rgba(28,20,16,0.06)]">
+              {/* AI Materials Detection */}
+              <AIDetectionSection
+                title={productData.title}
+                category={productData.category}
+                isEcoFriendly={productData.isEcoFriendly}
+                onTitleChange={(title) => {
+                  setProductData(prev => ({ ...prev, title }))
+                  if (validationErrors.title) {
+                    setValidationErrors(prev => ({ ...prev, title: '' }))
+                  }
+                }}
+                onCategoryChange={(category) => setProductData(prev => ({ ...prev, category }))}
+                onEcoFriendlyChange={(isEcoFriendly) => setProductData(prev => ({ ...prev, isEcoFriendly }))}
+                errors={validationErrors}
+                materialAnalysis={materialAnalysis}
+                isAnalyzing={isAnalyzingImage}
+              />
+            </div>
 
-            <Card className="p-4">
-            {/* AI-Powered Pricing Assistant */}
-            <PricingSection
-              price={productData.price}
-              onPriceChange={(price) => {
-                setProductData(prev => ({ ...prev, price }))
-                if (validationErrors.price) {
-                  setValidationErrors(prev => ({ ...prev, price: '' }))
-                }
-              }}
-              errors={validationErrors}
-              materialAnalysis={materialAnalysis}
-              isAnalyzing={isAnalyzingImage}
-            />
-            </Card>
+            <div className="bg-white rounded-[32px] p-6 shadow-xl shadow-[#1C1410]/5 border border-[rgba(28,20,16,0.06)]">
+              {/* AI-Powered Pricing Assistant */}
+              <PricingSection
+                price={productData.price}
+                onPriceChange={(price) => {
+                  setProductData(prev => ({ ...prev, price }))
+                  if (validationErrors.price) {
+                    setValidationErrors(prev => ({ ...prev, price: '' }))
+                  }
+                }}
+                errors={validationErrors}
+                materialAnalysis={materialAnalysis}
+                isAnalyzing={isAnalyzingImage}
+              />
+            </div>
 
-            <Card className="p-4">
+            <div className="bg-white rounded-[32px] p-6 shadow-xl shadow-[#1C1410]/5 border border-[rgba(28,20,16,0.06)]">
             {/* Description Builder */}
             <DescriptionBuilder
               description={productData.description}
@@ -769,28 +761,31 @@ export default function InstantProductListing() {
               hasImage={!!(imageFile || productData.imageUrl)}
               hasExistingContent={!!productData.description.trim()}
             />
+            </div>
 
             {/* Story Section */}
-            <div className="mb-6">
+            <div className="mb-8">
               <div 
-                className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg cursor-pointer hover:from-purple-100 hover:to-blue-100 transition-colors"
+                className="flex items-center justify-between p-4 bg-[#F5F0EB] rounded-2xl cursor-pointer hover:bg-[#E8E1D7] transition-colors border border-[rgba(28,20,16,0.04)]"
                 onClick={() => setStoryExpanded(!storyExpanded)}
               >
-                <div className="flex items-center space-x-2">
-                  <span className="text-lg">📖</span>
-                  <h3 className="font-semibold text-gray-800">Craft Story</h3>
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                    <span className="text-lg">📖</span>
+                  </div>
+                  <h3 className="font-craft text-xl font-bold text-[#1C1410]">Craft Story</h3>
                   {productData.story && (
-                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                      Story Added
+                    <span className="text-[10px] bg-[#166534] text-white px-2 py-1 rounded-full uppercase tracking-wider font-bold">
+                      Attached
                     </span>
                   )}
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs text-gray-500">
-                    {storyExpanded ? 'Click to collapse' : 'Click to expand'}
+                  <span className="text-xs text-[#7A6A5A] font-bold uppercase tracking-wider">
+                    {storyExpanded ? 'Collapse' : 'Expand'}
                   </span>
                   <svg 
-                    className={`w-5 h-5 text-gray-500 transition-transform ${storyExpanded ? 'transform rotate-180' : ''}`}
+                    className={`w-5 h-5 text-[#C2600A] transition-transform ${storyExpanded ? 'transform rotate-180' : ''}`}
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -801,45 +796,44 @@ export default function InstantProductListing() {
               </div>
 
               {storyExpanded && (
-                <div className="mt-3 p-4 border border-gray-200 rounded-lg bg-white">
+                <div className="mt-4 p-6 border border-[#E8E1D7] rounded-[24px] bg-white/50 backdrop-blur-sm">
                   {/* Image Preview in Story Section */}
                   {imagePreview && (
-                    <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Your Craft Image</h4>
+                    <div className="mb-6 p-4 bg-white shadow-sm border border-[#E8E1D7] rounded-[16px] text-center">
+                      <h4 className="text-xs font-bold text-[#7A6A5A] uppercase tracking-wider mb-3">Linked Craft</h4>
                       <img 
                         src={imagePreview} 
                         alt="Your craft" 
-                        className="w-full max-w-xs mx-auto h-32 object-cover rounded-lg"
+                        className="w-full max-w-[200px] mx-auto h-32 object-cover rounded-xl"
                       />
                     </div>
                   )}
                   
-                  <div className="mb-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Artisan Story
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold text-[#1C1410] mb-1">
+                      Artisan's Narrative
                     </label>
-                    <p className="text-xs text-gray-500 mb-3">
-                      Tell the story behind your craft - your journey, inspiration, and the tradition behind this piece.
+                    <p className="text-xs text-[#7A6A5A] mb-3">
+                      Your buyers want to know the inspiration and cultural significance behind this piece.
                     </p>
                     <textarea
                       value={productData.story || ''}
                       onChange={(e) => setProductData(prev => ({ ...prev, story: e.target.value }))}
-                      placeholder="Share the story behind this beautiful piece... your inspiration, the techniques used, or the cultural significance..."
-                      className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                      placeholder="Share the story behind this beautiful piece..."
+                      className="w-full h-32 p-4 bg-white border border-[#E8E1D7] rounded-[16px] focus:outline-none focus:border-[#C2600A]/30 text-[15px] resize-none text-[#3D2E26]"
                     />
                   </div>
 
-                  <div className="flex flex-wrap gap-2">
-                    <Button
+                  <div className="flex flex-wrap gap-3">
+                    <button
                       onClick={generateAIStory}
                       disabled={isGeneratingStory}
-                      variant="outline"
-                      className="flex items-center space-x-2"
+                      className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#C2600A] to-[#F5C842] text-white font-bold text-sm rounded-xl hover:-translate-y-0.5 transition-all shadow-md disabled:opacity-70 disabled:hover:translate-y-0"
                     >
                       {isGeneratingStory ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
-                          <span>Generating...</span>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                          <span>Penning Story...</span>
                         </>
                       ) : (
                         <>
@@ -847,33 +841,31 @@ export default function InstantProductListing() {
                           <span>Generate AI Story</span>
                         </>
                       )}
-                    </Button>
+                    </button>
 
-                    <Button
+                    <button
                       onClick={navigateToStoryBuilder}
-                      variant="outline"
-                      className="flex items-center space-x-2"
+                      className="flex items-center space-x-2 px-4 py-2 bg-white text-[#7A6A5A] font-bold text-sm rounded-xl border border-[#E8E1D7] hover:bg-[#F5F0EB] transition-colors"
                     >
                       <span>🛠️</span>
                       <span>Story Builder</span>
-                    </Button>
+                    </button>
 
                     {productData.story && (
-                      <Button
+                      <button
                         onClick={() => setProductData(prev => ({ ...prev, story: '' }))}
-                        variant="outline"
-                        className="flex items-center space-x-2 text-red-600 hover:text-red-700"
+                        className="flex items-center space-x-2 px-4 py-2 bg-white text-red-600 font-bold text-sm rounded-xl border border-[#E8E1D7] hover:bg-red-50 hover:border-red-200 transition-colors"
                       >
                         <span>🗑️</span>
                         <span>Clear Story</span>
-                      </Button>
+                      </button>
                     )}
                   </div>
 
                   {productData.story && (
-                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                      <p className="text-xs text-gray-600 mb-2">Preview:</p>
-                      <p className="text-sm text-gray-800 leading-relaxed">
+                    <div className="mt-6 p-4 bg-[#F5F0EB] rounded-2xl border border-[rgba(28,20,16,0.04)]">
+                      <p className="text-xs text-[#7A6A5A] font-bold uppercase tracking-wider mb-3">Live Preview:</p>
+                      <p className="text-[15px] text-[#3D2E26] leading-relaxed font-body">
                         {productData.story}
                       </p>
                     </div>
@@ -882,25 +874,26 @@ export default function InstantProductListing() {
               )}
             </div>
 
-            {/* Global Shipping */}
-            <div className="mb-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <input
-                  type="checkbox"
-                  checked={productData.hasGlobalShipping}
-                  onChange={(e) => setProductData(prev => ({ ...prev, hasGlobalShipping: e.target.checked }))}
-                  className="w-4 h-4"
-                />
-                <label>🌍 Global Shipping</label>
-              </div>
-              <p className="text-sm text-gray-600">Est. cost: $8-15 worldwide based on size & weight</p>
-            </div>
+            <div className="bg-white rounded-[32px] p-6 shadow-xl shadow-[#1C1410]/5 border border-[rgba(28,20,16,0.06)]">
+              {/* Global Shipping & Authenticity */}
+              <div className="space-y-6">
+                <div>
+                  <div className="flex items-center space-x-3 mb-2">
+                    <input
+                      type="checkbox"
+                      checked={productData.hasGlobalShipping}
+                      onChange={(e) => setProductData(prev => ({ ...prev, hasGlobalShipping: e.target.checked }))}
+                      className="w-5 h-5 text-[#C2600A] focus:ring-[#C2600A] rounded border-[#E8E1D7]"
+                    />
+                    <label className="font-bold text-[#1C1410]">🌍 Global Shipping</label>
+                  </div>
+                  <p className="text-sm text-[#7A6A5A] ml-8">Est. cost: $8-15 worldwide based on size & weight</p>
+                </div>
 
-            {/* Authenticity Badge */}
-            <div className="mb-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <input type="checkbox" className="w-4 h-4" defaultChecked />
-                <label>🛡️ Authenticity Badge</label>
+                <div>
+                  <div className="flex items-center space-x-3 mb-3">
+                    <input type="checkbox" className="w-5 h-5 text-[#C2600A] focus:ring-[#C2600A] rounded border-[#E8E1D7]" defaultChecked />
+                    <label className="font-bold text-[#1C1410]">🛡️ Authenticity Badge</label>
                 {materialAnalysis && (
                   <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full ml-2">
                     AI Verified: {materialAnalysis.confidence}% confidence
@@ -936,85 +929,71 @@ export default function InstantProductListing() {
                   ✨ {materialAnalysis.rarity}
                 </p>
               )}
-            </div>
+                </div>
+              </div>
 
-            {/* Bottom Actions */}
-            <div className="space-y-3 pt-4 border-t">
-              {/* Draft Management */}
-              {showLoadDraftOption && (
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                  <div className="flex items-center text-blue-800">
-                    <span className="mr-2">📄</span>
-                    <span className="text-sm">Drafts available</span>
+              {/* Bottom Actions */}
+              <div className="mt-8 pt-6 border-t border-[#E8E1D7] space-y-4">
+                {/* Draft Management */}
+                {showLoadDraftOption && (
+                  <div className="flex items-center justify-between p-4 bg-[#F5F0EB] rounded-2xl border border-[rgba(28,20,16,0.04)]">
+                    <div className="flex items-center text-[#7A6A5A] font-bold">
+                      <span className="mr-3 text-lg">📄</span>
+                      <span className="text-sm">Drafts available</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <button className="px-3 py-1.5 text-sm font-bold text-[#3D2E26] hover:bg-white rounded-xl transition-colors" onClick={loadDraft}>
+                        Load
+                      </button>
+                      <button className="px-3 py-1.5 text-sm font-bold text-red-600 hover:bg-white rounded-xl transition-colors" onClick={clearForm}>
+                        Clear
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex space-x-2">
-                    <Button variant="ghost" size="sm" onClick={loadDraft}>
-                      Load Draft
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={clearForm}>
-                      Clear Form
-                    </Button>
-                  </div>
+                )}
+
+                {/* Main Actions */}
+                <div className="flex flex-col sm:flex-row justify-between gap-4">
+                  <button 
+                    onClick={handleSaveDraft}
+                    disabled={isSaving}
+                    className="flex-1 py-4 px-6 bg-white border-2 border-[#E8E1D7] text-[#3D2E26] font-bold rounded-[16px] hover:border-[#C2600A]/30 hover:bg-[#F5F0EB] transition-all disabled:opacity-50"
+                  >
+                    {isSaving ? 'Saving...' : '💾 Save as Draft'}
+                  </button>
+                  <button 
+                    onClick={handlePublish}
+                    disabled={isSaving || isPublishing}
+                    className="flex-1 py-4 px-6 bg-gradient-to-r from-[#C2600A] to-[#F5C842] text-white font-bold rounded-[16px] hover:shadow-lg hover:-translate-y-1 transition-all disabled:opacity-50 disabled:hover:translate-y-0"
+                  >
+                    {isPublishing ? publishStep || 'Publishing...' : '✨ Publish Masterpiece'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Validation Errors */}
+              {Object.keys(validationErrors).length > 0 && (
+                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-2xl">
+                  <h4 className="text-red-800 font-bold mb-2">Please fix the following errors:</h4>
+                  <ul className="text-red-700 text-sm space-y-1">
+                    {Object.entries(validationErrors).map(([field, error]) => (
+                      <li key={field}>• {error}</li>
+                    ))}
+                  </ul>
                 </div>
               )}
-
-              {/* Main Actions */}
-              <div className="flex justify-between gap-3">
-                <Button 
-                  variant="secondary" 
-                  onClick={handleSaveDraft}
-                  disabled={isSaving}
-                  className="flex-1"
-                >
-                  {isSaving ? (
-                    <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-                      Saving...
-                    </div>
-                  ) : (
-                    '💾 Save as Draft'
-                  )}
-                </Button>
-                <Button 
-                  className="bg-orange-500 hover:bg-orange-600 flex-1"
-                  onClick={handlePublish}
-                  disabled={isSaving || isPublishing}
-                >
-                  {isPublishing ? (
-                    <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      {publishStep || 'Publishing...'}
-                    </div>
-                  ) : (
-                    '� Publish Product'
-                  )}
-                </Button>
-              </div>
             </div>
-
-            {/* Validation Errors */}
-            {Object.keys(validationErrors).length > 0 && (
-              <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <h4 className="text-red-800 font-semibold mb-2">Please fix the following errors:</h4>
-                <ul className="text-red-700 text-sm space-y-1">
-                  {Object.entries(validationErrors).map(([field, error]) => (
-                    <li key={field}>• {error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            </Card>
           </div>
 
           {/* Right Panel - Live Preview */}
-          <div className="lg:sticky lg:top-4 lg:self-start">
-            <Card className="p-4 h-fit">
+          <div className="lg:col-span-5 relative">
+            <div className="sticky top-8 bg-white rounded-[32px] p-6 shadow-xl shadow-[#1C1410]/10 border border-[rgba(28,20,16,0.06)] xl:h-[calc(100vh-100px)] xl:overflow-y-auto hidden-scrollbar">
               <ProductPreview
                 productData={productData}
                 activeView={activeView}
                 onViewChange={setActiveView}
               />
-            </Card>
+            </div>
           </div>
         </div>
       </div>

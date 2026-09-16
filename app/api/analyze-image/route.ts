@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
 async function analyzeWithGeminiVision(base64: string, mimeType: string, productTitle: string, category: string) {
   if (!genAI) throw new Error('Gemini AI not initialized')
 
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+  const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' })
 
   const prompt = `Analyze this craft/artisan product image and provide a concise analysis as JSON:
 {

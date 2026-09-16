@@ -3,8 +3,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 
 // Initialize Gemini AI (fallback to mock if no API key)
 const apiKey = process.env.GOOGLE_AI_API_KEY
-const genAI = apiKey && apiKey !== 'demo_key_use_mock_data' 
-  ? new GoogleGenerativeAI(apiKey) 
+const genAI = apiKey && apiKey !== 'demo_key_use_mock_data'
+  ? new GoogleGenerativeAI(apiKey)
   : null
 
 export async function POST(request: NextRequest) {
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       // Use enhanced mock analysis
       materialAnalysis = await getMockAnalysis(file.name, file.size)
     }
-    
+
     return NextResponse.json({
       success: true,
       analysis: materialAnalysis,
@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
 
 async function analyzeWithGemini(base64: string, mimeType: string) {
   if (!genAI) throw new Error('Gemini AI not initialized')
-  
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+
+  const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' })
 
   const prompt = `Analyze this craft/artisan image and provide detailed information in JSON format with these exact fields:
 {
@@ -131,7 +131,7 @@ Be specific and accurate. If unsure about something, indicate lower confidence.`
     const jsonMatch = text.match(/\{[\s\S]*\}/)
     if (jsonMatch) {
       const analysis = JSON.parse(jsonMatch[0])
-      
+
       // Ensure required fields exist
       return {
         materials: analysis.materials || ['Handcrafted Material'],
@@ -215,9 +215,9 @@ async function getMockAnalysis(fileName: string, fileSize: number) {
 
   // Add processing delay to simulate real AI
   await new Promise(resolve => setTimeout(resolve, 2500))
-  
+
   const selectedAnalysis = analyses[Math.floor(Math.random() * analyses.length)]
-  
+
   return {
     ...selectedAnalysis,
     analysisDetails: {

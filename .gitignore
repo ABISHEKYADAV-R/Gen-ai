@@ -52,3 +52,4 @@ dist/
 pnpm-lock.yaml
 package-lock.json
 *.log
+.env*

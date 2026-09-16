@@ -58,7 +58,7 @@ function StoryBuilderContent() {
       formData.append("storyTone", storyTone);
       if (image) formData.append("image", image);
       
-      const res = await fetch("/api/generateStory", {
+      const res = await fetch("/api/generate-story", {
         method: "POST",
         body: formData,
       });
