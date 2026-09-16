@@ -1,9 +1,11 @@
 "use client";
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { Sparkles, Image as ImageIcon, Wand2, RefreshCw, PenSquare, ArrowRight, X, Home } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ProtectedRoute } from "../../components/ProtectedRoute";
 
-export default function StoryBuilder() {
+function StoryBuilderContent() {
   const router = useRouter();
   const [storyIdea, setStoryIdea] = useState("");
   const [storyTone, setStoryTone] = useState("Inspirational");
@@ -20,14 +22,12 @@ export default function StoryBuilder() {
       const file = e.target.files[0];
       setImage(file);
       
-      // Create image preview
       const reader = new FileReader();
       reader.onload = (event) => {
         setImagePreview(event.target?.result as string);
       };
       reader.readAsDataURL(file);
       
-      // Get image description from backend
       setImageDescLoading(true);
       const formData = new FormData();
       formData.append("image", file);
@@ -56,9 +56,8 @@ export default function StoryBuilder() {
       const formData = new FormData();
       formData.append("storyIdea", storyIdea);
       formData.append("storyTone", storyTone);
-      if (image) {
-        formData.append("image", image);
-      }
+      if (image) formData.append("image", image);
+      
       const res = await fetch("/api/generateStory", {
         method: "POST",
         body: formData,
@@ -68,9 +67,7 @@ export default function StoryBuilder() {
         setGeneratedStory(`Error: ${data.error} ${data.details ? JSON.stringify(data.details) : ""}`);
       } else {
         setGeneratedStory(data.story);
-        if (data.imageDescription) {
-          setImageDesc(data.imageDescription);
-        }
+        if (data.imageDescription) setImageDesc(data.imageDescription);
       }
     } catch (err) {
       setGeneratedStory("Failed to generate story.");
@@ -79,20 +76,9 @@ export default function StoryBuilder() {
     setIsEditing(false);
   };
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleRegenerate = () => {
-    handleGenerateStory();
-  };
-
   const handleUpdateStory = () => {
-    // Navigate to product listing page with the story content
     if (generatedStory) {
-      // Store the story in localStorage so it can be accessed in the product listing page
       localStorage.setItem('storyContent', generatedStory);
-      // Add a brief success indication
       setLoading(true);
       setTimeout(() => {
         router.push('/instant-product-listing?from=story-builder');
@@ -101,263 +87,212 @@ export default function StoryBuilder() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <div></div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              ✨ Artisan Story Builder
-            </h1>
-            <Button 
-              onClick={() => router.push('/dashboard')}
-              variant="ghost" 
-              className="text-sm"
-            >
-              🏠 Dashboard
-            </Button>
+    <div style={{ minHeight: "100vh", background: "#FBF7F0", fontFamily: "'Inter', sans-serif" }}>
+      
+      {/* Header */}
+      <header style={{ background: "#1A1A2E", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(245,200,66,0.15)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #C2600A, #F5C842)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Sparkles size={18} color="#fff" />
           </div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Share your authentic crafting journey - the inspiration, challenges, and passion behind your unique creations
+          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 700, color: "#FBF7F0" }}>Story Builder</h1>
+        </div>
+        <button onClick={() => router.push('/dashboard')}
+          style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 8, background: "rgba(255,255,255,0.08)", color: "#FBF7F0", border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer", transition: "all 0.2s" }}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.12)"}
+          onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.08)"}
+        >
+          <Home size={16} /> Dashboard
+        </button>
+      </header>
+
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px" }}>
+        
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 900, color: "#1C1410", marginBottom: 16 }}>
+            Share the <span style={{ background: "linear-gradient(135deg, #C2600A, #E07B39)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Spirit of Your Craft</span>
+          </h2>
+          <p style={{ fontSize: 16, color: "#7A6A5A", maxWidth: 640, margin: "0 auto", lineHeight: 1.6 }}>
+            Upload a photo and a brief note about your process. Let AI weave it into an emotional narrative that resonates with buyers.
           </p>
         </div>
 
-        <div className="flex gap-8">
-          {/* Left: Form */}
-          <div className="bg-white rounded-xl shadow-lg p-8 flex-1 max-w-md">
-            <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
-              <h3 className="font-semibold text-purple-800 mb-2">💡 Story Tips</h3>
-              <ul className="text-sm text-purple-700 space-y-1">
-                <li>• Share what inspired this piece</li>
-                <li>• Describe your crafting process</li>
-                <li>• Mention challenges you overcame</li>
-                <li>• Explain what makes it special</li>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 32 }}>
+          
+          {/* Left Area - Form */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            style={{ background: "#fff", borderRadius: 20, padding: 32, border: "1px solid rgba(28,20,16,0.08)", boxShadow: "0 4px 20px rgba(28,20,16,0.04)" }}>
+            
+            <div style={{ background: "#FDE8D5", border: "1px solid rgba(194,96,10,0.2)", borderRadius: 12, padding: 20, marginBottom: 28 }}>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: "#C2600A", marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+                💡 Writing Prompts
+              </h3>
+              <ul style={{ fontSize: 13, color: "#9B4608", lineHeight: 1.8, margin: 0, paddingLeft: 20 }}>
+                <li>What material inspired this specific piece?</li>
+                <li>How long did the process take?</li>
+                <li>Is there a special technique you used?</li>
               </ul>
             </div>
 
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <span className="mr-2">🎨</span>
-              Your Craft Story
-            </h2>
-            
-            <label className="block mb-2 font-medium">Share Your Journey</label>
-            <p className="text-sm text-gray-600 mb-3">
-              Tell us about your inspiration, the materials you chose, and the process of creating this piece...
-            </p>
-            <textarea
-              className="w-full border rounded-lg p-4 mb-4 resize-none h-32 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="Example: I was inspired by the morning light filtering through my studio window. I chose clay from the local riverbank because of its unique texture. The biggest challenge was achieving the perfect glaze - it took three attempts before I got the color just right..."
-              value={storyIdea}
-              onChange={e => setStoryIdea(e.target.value)}
-            />
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ display: "block", fontSize: 14, fontWeight: 700, color: "#1C1410", marginBottom: 8 }}>Your Raw Thoughts</label>
+              <textarea
+                value={storyIdea}
+                onChange={e => setStoryIdea(e.target.value)}
+                placeholder="E.g. I used local river clay and shaped this by hand. It took 3 days to perfect the glaze..."
+                style={{ width: "100%", height: 120, padding: 16, borderRadius: 12, border: "1.5px solid rgba(28,20,16,0.12)", background: "#FBF7F0", fontSize: 14, color: "#1C1410", outline: "none", resize: "none", transition: "border-color 0.2s" }}
+                onFocus={e => e.target.style.borderColor = "#C2600A"}
+                onBlur={e => e.target.style.borderColor = "rgba(28,20,16,0.12)"}
+              />
+            </div>
 
-            <label className="block mb-2 font-medium">Upload Craft Image</label>
-            <div className="mb-4">
-              <label className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 cursor-pointer text-gray-500 hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 mb-2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4m0 0V8m0 4h4m-4 0H8m8 4a4 4 0 10-8 0 4 4 0 008 0z" />
-                </svg>
-                <span className="text-center">
-                  <span className="font-medium">Click to upload</span> or drag and drop
-                </span>
-                <span className="text-xs mt-1 text-center">
-                  All image formats supported: JPG, PNG, JPEG, GIF, BMP, WEBP, SVG, TIFF
-                </span>
-                <span className="text-xs text-gray-400">Max size: 10MB</span>
-                <input 
-                  type="file" 
-                  accept="image/*,.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg,.tiff,.tif" 
-                  className="hidden" 
-                  onChange={handleImageUpload} 
-                />
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ display: "flex", justifyContent: "space-between", alignItems: "end", marginBottom: 8 }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: "#1C1410" }}>Craft Image (Optional)</span>
               </label>
-              {image && (
-                <div className="mt-3">
-                  {/* Image Preview */}
-                  <div className="mb-3 p-2 bg-gray-50 border border-gray-200 rounded-lg">
-                    <div className="relative">
-                      {imagePreview ? (
-                        <img 
-                          src={imagePreview} 
-                          alt="Uploaded craft" 
-                          className="w-full h-48 object-cover rounded-lg"
+              
+              {!image ? (
+                <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 20px", border: "2px dashed rgba(28,20,16,0.15)", borderRadius: 12, cursor: "pointer", background: "#FDFCFB", transition: "all 0.2s" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#C2600A"; e.currentTarget.style.background = "#FDE8D5"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(28,20,16,0.15)"; e.currentTarget.style.background = "#FDFCFB"; }}
+                >
+                  <ImageIcon size={32} color="#C2600A" style={{ marginBottom: 12 }} />
+                  <span style={{ fontSize: 14, fontWeight: 600, color: "#1C1410", marginBottom: 4 }}>Click to upload photo</span>
+                  <span style={{ fontSize: 12, color: "#7A6A5A" }}>JPG, PNG, WEBP (Max 10MB)</span>
+                  <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                </label>
+              ) : (
+                <div style={{ position: "relative", borderRadius: 12, overflow: "hidden", border: "1px solid rgba(28,20,16,0.1)" }}>
+                  <img src={imagePreview!} alt="Uploaded craft" style={{ width: "100%", height: 180, objectFit: "cover", display: "block" }} />
+                  <button onClick={() => { setImage(null); setImagePreview(null); setImageDesc(""); }}
+                    style={{ position: "absolute", top: 10, right: 10, width: 32, height: 32, borderRadius: 8, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
+                    <X size={16} />
+                  </button>
+                  <div style={{ padding: "12px 16px", background: "#fff", display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ flex: 1 }}>
+                      <input type="text" value={imageDesc} onChange={e => setImageDesc(e.target.value)} disabled={imageDescLoading}
+                        placeholder={imageDescLoading ? "Analyzing..." : "Image description..."}
+                        style={{ width: "100%", fontSize: 13, padding: 8, borderRadius: 6, border: "1px solid rgba(28,20,16,0.1)", background: "#FBF7F0", outline: "none" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 32 }}>
+              <label style={{ display: "block", fontSize: 14, fontWeight: 700, color: "#1C1410", marginBottom: 8 }}>Story Tone</label>
+              <select value={storyTone} onChange={e => setStoryTone(e.target.value)}
+                style={{ width: "100%", padding: "14px 16px", borderRadius: 12, border: "1.5px solid rgba(28,20,16,0.12)", background: "#FBF7F0", fontSize: 14, color: "#1C1410", outline: "none", cursor: "pointer", appearance: "none" }}>
+                <option>Inspirational</option>
+                <option>Ancestral & Traditional</option>
+                <option>Modern & Minimalist</option>
+                <option>Emotional</option>
+                <option>Educational</option>
+              </select>
+            </div>
+
+            <button onClick={handleGenerateStory} disabled={loading}
+              style={{ width: "100%", padding: 16, borderRadius: 12, background: loading ? "#D4A87A" : "linear-gradient(135deg, #C2600A, #E07B39)", color: "#fff", cursor: loading ? "not-allowed" : "pointer", border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontSize: 16, fontWeight: 700, boxShadow: loading ? "none" : "0 8px 24px rgba(194,96,10,0.3)", transition: "all 0.2s" }}
+              onMouseEnter={e => { if(!loading) { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 10px 28px rgba(194,96,10,0.4)"; } }}
+              onMouseLeave={e => { if(!loading) { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 8px 24px rgba(194,96,10,0.3)"; } }}
+            >
+              {loading ? (
+                <><div style={{ width: 18, height: 18, border: "2px solid rgba(255,255,255,0.5)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Crafting Story...</>
+              ) : (
+                <><Wand2 size={20} /> Generate Artisan Story</>
+              )}
+            </button>
+          </motion.div>
+
+          {/* Right Area - Result */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            style={{ display: "flex", flexDirection: "column" }}>
+            
+            <div style={{ flex: 1, background: "#fff", borderRadius: 20, padding: 32, border: "1px solid rgba(28,20,16,0.08)", boxShadow: "0 4px 20px rgba(28,20,16,0.04)", display: "flex", flexDirection: "column" }}>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, fontWeight: 700, color: "#1C1410", marginBottom: 24, display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 24 }}>📜</span> The Generated Story
+              </h3>
+
+              <div style={{ flex: 1, minHeight: 300, background: "#FBF7F0", borderRadius: 12, padding: 24, border: "1px solid rgba(28,20,16,0.08)", position: "relative" }}>
+                <AnimatePresence mode="wait">
+                  {loading ? (
+                    <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                      style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                      <Wand2 size={32} color="#C2600A" style={{ marginBottom: 16, animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite" }} />
+                      <div style={{ fontSize: 15, fontWeight: 600, color: "#1C1410", marginBottom: 4 }}>AI is writing...</div>
+                      <div style={{ fontSize: 13, color: "#7A6A5A" }}>Capturing the essence of your craft</div>
+                    </motion.div>
+                  ) : generatedStory ? (
+                    <motion.div key="story" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ height: "100%" }}>
+                      {isEditing ? (
+                        <textarea
+                          value={generatedStory}
+                          onChange={e => setGeneratedStory(e.target.value)}
+                          style={{ width: "100%", height: "100%", padding: 0, background: "transparent", border: "none", fontSize: 15, lineHeight: 1.8, color: "#1C1410", outline: "none", resize: "none" }}
                         />
                       ) : (
-                        <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                          <p className="text-gray-500">No image uploaded</p>
+                        <div style={{ fontSize: 15, lineHeight: 1.8, color: "#3D2E26", whiteSpace: "pre-wrap" }}>
+                          {generatedStory}
                         </div>
                       )}
-                      <button
-                        onClick={() => {
-                          setImage(null); 
-                          setImagePreview(null);
-                          setImageDesc("");
-                        }}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {/* File Info */}
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-green-600">📷</span>
-                        <span className="text-sm font-medium text-green-800">{image.name}</span>
-                        <span className="text-xs text-green-600">
-                          ({(image.size / 1024 / 1024).toFixed(1)}MB)
-                        </span>
+                    </motion.div>
+                  ) : (
+                    <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                      style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: 32 }}>
+                      <div style={{ width: 64, height: 64, borderRadius: 16, background: "#FDFCFB", border: "1.5px dashed rgba(28,20,16,0.15)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+                        <span style={{ fontSize: 24, opacity: 0.5 }}>🖋️</span>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        {imageDescLoading && (
-                          <div className="flex items-center space-x-1 text-xs text-blue-600">
-                            <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            <span>Analyzing image...</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <label className="block mb-2 font-medium">Image Description</label>
-            <div className="relative">
-              <input
-                type="text"
-                className="w-full border rounded-lg p-3 mb-4 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder={imageDescLoading ? "Analyzing image..." : "Describe your craft (e.g. 'hand-carved wooden sculpture')"}
-                value={imageDesc}
-                onChange={e => setImageDesc(e.target.value)}
-                disabled={imageDescLoading}
-              />
-              {imageDescLoading && (
-                <div className="absolute right-3 top-3">
-                  <svg className="animate-spin h-5 w-5 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                </div>
-              )}
-            </div>
-
-            <label className="block mb-2 font-medium">Story Tone</label>
-            <select
-              className="w-full border rounded-lg p-3 mb-6 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              value={storyTone}
-              onChange={e => setStoryTone(e.target.value)}
-            >
-              <option>Inspirational</option>
-              <option>Humorous</option>
-              <option>Emotional</option>
-              <option>Educational</option>
-            </select>
-
-            <Button 
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700" 
-              onClick={handleGenerateStory}
-              disabled={loading}
-            >
-              {loading ? "Crafting Your Story..." : "Generate Artisan Story"}
-            </Button>
-          </div>
-
-          {/* Right: Generated Story */}
-          <div className="bg-white rounded-xl shadow-lg p-8 flex-1">
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <span className="mr-2">📖</span>
-              Your Generated Story
-              {image && imagePreview && (
-                <span className="ml-auto text-sm text-gray-500">with image</span>
-              )}
-            </h2>
-            
-            {/* Image Preview in Story Section */}
-            {image && imagePreview && !loading && (
-              <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                <img 
-                  src={imagePreview} 
-                  alt="Your craft" 
-                  className="w-full max-w-sm mx-auto h-40 object-cover rounded-lg"
-                />
-                <p className="text-center text-sm text-gray-600 mt-2">
-                  {imageDesc || "Your craft image"}
-                </p>
+                      <div style={{ fontSize: 15, fontWeight: 600, color: "#1C1410", marginBottom: 6 }}>Your story will appear here</div>
+                      <div style={{ fontSize: 13, color: "#7A6A5A", lineHeight: 1.6 }}>Fill out the details on the left and hit generate to see the magic happen.</div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            )}
-            
-            <div className="bg-gray-100 rounded-lg p-6 min-h-[200px] flex items-center justify-center text-gray-500">
-              {loading ? (
-                <div className="flex flex-col items-center animate-pulse">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 mb-2 text-purple-600 animate-spin">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  </svg>
-                  <span className="font-medium">Crafting your authentic artisan story...</span>
-                  <span className="text-xs mt-1">Including challenges and creation process</span>
-                </div>
-              ) : generatedStory ? (
-                isEditing ? (
-                  <textarea
-                    className="w-full border rounded-lg p-4 h-40 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                    value={generatedStory}
-                    onChange={e => setGeneratedStory(e.target.value)}
-                  />
-                ) : (
-                  <div className="w-full text-left">
-                    <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">{generatedStory}</p>
+
+              {/* Action buttons */}
+              {generatedStory && !loading && (
+                <div style={{ marginTop: 24 }}>
+                  <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+                    <button onClick={() => setIsEditing(!isEditing)}
+                      style={{ flex: 1, padding: "12px", borderRadius: 10, background: isEditing ? "#FDE8D5" : "#fff", border: isEditing ? "1px solid #C2600A" : "1px solid rgba(28,20,16,0.15)", color: isEditing ? "#C2600A" : "#1C1410", fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer", transition: "all 0.2s" }}
+                    >
+                      <PenSquare size={16} /> {isEditing ? "Done Editing" : "Edit Story"}
+                    </button>
+                    <button onClick={handleGenerateStory}
+                      style={{ flex: 1, padding: "12px", borderRadius: 10, background: "#fff", border: "1px solid rgba(28,20,16,0.15)", color: "#1C1410", fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer", transition: "all 0.2s" }}
+                      onMouseEnter={e => e.currentTarget.style.background = "#FBF7F0"}
+                      onMouseLeave={e => e.currentTarget.style.background = "#fff"}
+                    >
+                      <RefreshCw size={16} /> Regenerate
+                    </button>
                   </div>
-                )
-              ) : (
-                <div className="flex flex-col items-center text-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 mb-3 text-gray-400">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m-6-8h6" />
-                  </svg>
-                  <span className="font-medium mb-2">Your artisan story will appear here</span>
-                  <span className="text-sm text-gray-400 max-w-xs">
-                    Share your journey, upload an image, and let AI craft an authentic story about your creation process
-                  </span>
+                  <button onClick={handleUpdateStory}
+                    style={{ width: "100%", padding: 14, borderRadius: 10, background: "#16213E", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 15, fontWeight: 600, cursor: "pointer", border: "none", boxShadow: "0 4px 12px rgba(22,33,62,0.3)", transition: "all 0.2s" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#0F1A30"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "#16213E"; e.currentTarget.style.transform = ""; }}
+                  >
+                    Use this Story in Listing <ArrowRight size={16} />
+                  </button>
                 </div>
               )}
             </div>
-
-            <div className="flex gap-4 mt-6">
-              <Button 
-                variant="outline" 
-                className="flex-1" 
-                onClick={handleEdit} 
-                disabled={!generatedStory || loading}
-              >
-                ✏️ Edit Story
-              </Button>
-              <Button 
-                variant="outline" 
-                className="flex-1" 
-                onClick={handleRegenerate} 
-                disabled={!generatedStory || loading}
-              >
-                🔄 Regenerate
-              </Button>
-            </div>
-
-            <Button 
-              className="w-full mt-4 bg-green-600 hover:bg-green-700 font-semibold" 
-              onClick={handleUpdateStory} 
-              disabled={!generatedStory || loading}
-            >
-              <span className="mr-2">✨</span>
-              Update Story in Product Listing
-            </Button>
-          </div>
+          </motion.div>
         </div>
       </div>
+      
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .5; transform: scale(1.05); } }
+      `}</style>
     </div>
+  );
+}
+
+export default function StoryBuilder() {
+  return (
+    <ProtectedRoute>
+      <StoryBuilderContent />
+    </ProtectedRoute>
   );
 }

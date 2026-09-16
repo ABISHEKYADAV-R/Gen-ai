@@ -1,10 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Eye, EyeOff, Mail, User, Sparkles, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Eye, EyeOff, Mail, User, Sparkles, ArrowRight, Paintbrush, Globe, Star } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { authService } from "../../backend/firebase/authService";
 
@@ -16,46 +15,34 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: ""
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
 
-  // Redirect if already logged in - moved to useEffect
   useEffect(() => {
-    if (user) {
-      setIsRedirecting(true);
-      router.push("/dashboard");
-    }
+    if (user) { setIsRedirecting(true); router.push("/dashboard"); }
   }, [user, router]);
 
-  // Show loading spinner while redirecting
   if (isRedirecting || user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Redirecting to dashboard...</p>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#1A1A2E" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 48, height: 48, border: "3px solid #C2600A", borderTopColor: "transparent", borderRadius: "50%", margin: "0 auto 16px", animation: "spin 0.8s linear infinite" }} />
+          <p style={{ color: "rgba(251,247,240,0.6)", fontFamily: "'Inter', sans-serif" }}>Redirecting to dashboard...</p>
         </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!formData.email || (!isSignUp && !formData.password) || (isSignUp && (!formData.name || !formData.password))) return;
-    
-    setLoading(true);
-    setError("");
-
+    if (!formData.email || !formData.password || (isSignUp && !formData.name)) return;
+    setLoading(true); setError("");
     try {
-      if (isSignUp) {
-        await authService.signUp(formData.email, formData.password, formData.name);
-      } else {
-        await authService.signIn(formData.email, formData.password);
-      }
-      router.push("/dashboard");
+      let result;
+      if (isSignUp) result = await authService.signUp(formData.email, formData.password, formData.name);
+      else result = await authService.signIn(formData.email, formData.password);
+      if (result.success) router.push("/dashboard");
+      else setError(result.error || "An error occurred");
     } catch (err: any) {
       setError(err.message || "An error occurred");
     } finally {
@@ -64,12 +51,11 @@ export default function LoginPage() {
   }
 
   async function handleGoogleSignIn() {
-    setLoading(true);
-    setError("");
-
+    setLoading(true); setError("");
     try {
-      await authService.signInWithGoogle();
-      router.push("/dashboard");
+      const result = await authService.signInWithGoogle();
+      if (result.success) router.push("/dashboard");
+      else setError(result.error || "Google sign in failed");
     } catch (err: any) {
       setError(err.message || "An error occurred");
     } finally {
@@ -77,219 +63,256 @@ export default function LoginPage() {
     }
   }
 
+  const testimonials = [
+    { name: "Maya S.", country: "Bali, Indonesia", text: "I listed my ceramics and sold to buyers in 8 countries within two weeks.", emoji: "🏺" },
+    { name: "Amara K.", country: "Fes, Morocco", text: "The AI wrote a story about my silver jewelry that made customers cry.", emoji: "💎" },
+    { name: "Carlos R.", country: "Oaxaca, Mexico", text: "My carved masks finally found the global audience they deserved.", emoji: "🗿" },
+  ];
+
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-      {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 p-12 flex-col justify-center items-center text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="relative z-10 text-center"
-        >
-          <div className="mb-8">
-            <Sparkles className="w-16 h-16 mx-auto mb-4" />
-            <h1 className="text-4xl font-black mb-4">CraftAI</h1>
-            <p className="text-xl opacity-90">AI-Powered Craft Platform</p>
+    <div style={{ minHeight: "100vh", display: "flex", fontFamily: "'Inter', sans-serif" }}>
+
+      {/* ── Left Panel ───────────────────────────────── */}
+      <div style={{
+        display: "none", flex: "none", width: "48%",
+        background: "linear-gradient(160deg, #1A1A2E 0%, #16213E 40%, #2D1306 80%, #4A1F08 100%)",
+        padding: "48px 56px", flexDirection: "column", justifyContent: "space-between",
+        position: "relative", overflow: "hidden",
+      }} className="login-left">
+
+        {/* Background decorations */}
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+          <div style={{ position: "absolute", top: "10%", left: "10%", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(194,96,10,0.18) 0%, transparent 70%)", filter: "blur(40px)" }} />
+          <div style={{ position: "absolute", bottom: "15%", right: "5%", width: 250, height: 250, borderRadius: "50%", background: "radial-gradient(circle, rgba(245,200,66,0.1) 0%, transparent 70%)", filter: "blur(40px)" }} />
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(245,200,66,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(245,200,66,0.03) 1px, transparent 1px)", backgroundSize: "50px 50px" }} />
+        </div>
+
+        {/* Logo */}
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #C2600A, #F5C842)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Sparkles size={20} color="#fff" />
+            </div>
+            <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 700, color: "#FBF7F0" }}>CraftAI</span>
           </div>
-          
-          <div className="space-y-6 max-w-md">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-white/10 backdrop-blur-sm rounded-2xl p-6"
-            >
-              <h3 className="font-bold text-lg mb-2">Transform Your Craft</h3>
-              <p className="text-sm opacity-90">Turn your passion into profit with AI-powered storytelling and global marketplace access.</p>
-            </motion.div>
-            
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 }}
-              className="bg-white/10 backdrop-blur-sm rounded-2xl p-6"
-            >
-              <h3 className="font-bold text-lg mb-2">Join 2,000+ Artisans</h3>
-              <p className="text-sm opacity-90">Connect with a global community of creators and start selling worldwide today.</p>
-            </motion.div>
+        </div>
+
+        {/* Center content */}
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9 }} style={{ position: "relative", zIndex: 1 }}>
+          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(32px, 3vw, 48px)", fontWeight: 900, color: "#FBF7F0", lineHeight: 1.15, marginBottom: 20 }}>
+            Your Craft.<br />
+            <span style={{ background: "linear-gradient(135deg, #F5C842, #E07B39)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Your Story.</span><br />
+            Your Market.
+          </h1>
+          <p style={{ fontSize: 16, color: "rgba(251,247,240,0.6)", lineHeight: 1.75, marginBottom: 40, maxWidth: 380 }}>
+            Join over 2,000 artisans who use CraftAI to share their handmade work with buyers in 50+ countries.
+          </p>
+
+          {/* Stats */}
+          <div style={{ display: "flex", gap: 32, marginBottom: 48 }}>
+            {[{ n: "2K+", l: "Artisans" }, { n: "50+", l: "Countries" }, { n: "$1.2M", l: "Sold" }].map((s, i) => (
+              <div key={i}>
+                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 900, color: "#F5C842" }}>{s.n}</div>
+                <div style={{ fontSize: 12, color: "rgba(251,247,240,0.45)", textTransform: "uppercase", letterSpacing: 1 }}>{s.l}</div>
+              </div>
+            ))}
           </div>
+
+          {/* Testimonial */}
+          <motion.div
+            style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(12px)", border: "1px solid rgba(245,200,66,0.12)", borderRadius: 16, padding: 24 }}
+            animate={{ y: [0, -4, 0] }} transition={{ duration: 4, repeat: Infinity }}
+          >
+            <div style={{ fontSize: 28, marginBottom: 12 }}>{testimonials[0].emoji}</div>
+            <p style={{ fontSize: 15, color: "rgba(251,247,240,0.75)", lineHeight: 1.65, marginBottom: 16, fontStyle: "italic" }}>
+              "{testimonials[0].text}"
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #C2600A, #E07B39)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}>{testimonials[0].name[0]}</span>
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#FBF7F0" }}>{testimonials[0].name}</div>
+                <div style={{ fontSize: 12, color: "rgba(251,247,240,0.45)", display: "flex", alignItems: "center", gap: 4 }}>
+                  <Globe size={10} /> {testimonials[0].country}
+                </div>
+              </div>
+              <div style={{ marginLeft: "auto", display: "flex", gap: 2 }}>
+                {[1,2,3,4,5].map(i => <Star key={i} size={12} fill="#F5C842" color="#F5C842" />)}
+              </div>
+            </div>
+          </motion.div>
         </motion.div>
-        
-        {/* Decorative elements */}
-        <div className="absolute top-20 left-20 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
-        <div className="absolute bottom-20 right-20 w-40 h-40 bg-white/5 rounded-full blur-xl"></div>
+
+        {/* Bottom tagline */}
+        <div style={{ position: "relative", zIndex: 1, fontSize: 12, color: "rgba(251,247,240,0.3)", display: "flex", alignItems: "center", gap: 6 }}>
+          <Paintbrush size={12} /> Empowering artisans since 2024
+        </div>
       </div>
 
-      {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+      {/* ── Right Panel — Form ───────────────────────── */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", background: "#FBF7F0", padding: "40px 24px" }}>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-md"
+          style={{ width: "100%", maxWidth: 440 }}
         >
-          <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <div className="lg:hidden mb-6">
-                <Sparkles className="w-12 h-12 mx-auto text-purple-600 mb-2" />
-                <h1 className="text-2xl font-black text-purple-600">CraftAI</h1>
-              </div>
-              
-              <h2 className="text-3xl font-black text-gray-800 mb-2">
-                {isSignUp ? "Create Account" : "Welcome Back"}
-              </h2>
-              <p className="text-gray-500">
-                {isSignUp ? "Join thousands of artisans worldwide" : "Sign in to your artisan dashboard"}
-              </p>
+          {/* Mobile logo */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 40 }} className="login-mobile-logo">
+            <div style={{ width: 36, height: 36, borderRadius: 9, background: "linear-gradient(135deg, #C2600A, #F5C842)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Sparkles size={17} color="#fff" />
             </div>
+            <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, fontWeight: 700, color: "#1C1410" }}>CraftAI</span>
+          </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm"
-                >
-                  {error}
-                </motion.div>
-              )}
+          {/* Header */}
+          <div style={{ marginBottom: 36 }}>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 34, fontWeight: 900, color: "#1C1410", marginBottom: 8, lineHeight: 1.1 }}>
+              {isSignUp ? "Join the Community" : "Welcome Back"}
+            </h2>
+            <p style={{ fontSize: 15, color: "#7A6A5A" }}>
+              {isSignUp ? "Create your free artisan account today" : "Sign in to your artisan dashboard"}
+            </p>
+          </div>
 
+          {/* Google button */}
+          <button onClick={handleGoogleSignIn} disabled={loading}
+            style={{
+              width: "100%", padding: "13px", borderRadius: 10, marginBottom: 24,
+              background: "#fff", border: "1.5px solid rgba(28,20,16,0.12)",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 12,
+              fontSize: 15, fontWeight: 600, color: "#1C1410", cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(28,20,16,0.06)", transition: "all 0.2s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "#C2600A"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(194,96,10,0.12)"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(28,20,16,0.12)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(28,20,16,0.06)"; }}
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+            {loading ? "Connecting..." : "Continue with Google"}
+          </button>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+            <div style={{ flex: 1, height: 1, background: "rgba(28,20,16,0.1)" }} />
+            <span style={{ fontSize: 13, color: "#7A6A5A", flexShrink: 0 }}>or use email</span>
+            <div style={{ flex: 1, height: 1, background: "rgba(28,20,16,0.1)" }} />
+          </div>
+
+          {/* Error */}
+          <AnimatePresence>
+            {error && (
+              <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                style={{ padding: "12px 16px", borderRadius: 10, background: "#FEE2E2", border: "1px solid #FECACA", color: "#991B1B", fontSize: 14, marginBottom: 20 }}>
+                {error}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+            <AnimatePresence>
               {isSignUp && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="space-y-2"
-                >
-                  <label className="block text-sm font-semibold text-gray-700">Full Name</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="text"
-                      className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
-                      value={formData.name}
-                      onChange={e => setFormData({...formData, name: e.target.value})}
-                      placeholder="Enter your full name"
-                      required={isSignUp}
-                      disabled={loading}
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#3D2E26", marginBottom: 6 }}>Full Name</label>
+                  <div style={{ position: "relative" }}>
+                    <User size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#9B8B7A" }} />
+                    <input type="text" value={formData.name}
+                      onChange={e => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Your artisan name"
+                      style={{ width: "100%", padding: "12px 14px 12px 42px", borderRadius: 10, border: "1.5px solid rgba(28,20,16,0.15)", background: "#fff", fontSize: 15, color: "#1C1410", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
+                      onFocus={e => e.target.style.borderColor = "#C2600A"}
+                      onBlur={e => e.target.style.borderColor = "rgba(28,20,16,0.15)"}
                     />
                   </div>
                 </motion.div>
               )}
+            </AnimatePresence>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="email"
-                    className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
-                    value={formData.email}
-                    onChange={e => setFormData({...formData, email: e.target.value})}
-                    placeholder="Enter your email"
-                    required
-                    disabled={loading}
-                  />
-                </div>
+            <div>
+              <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#3D2E26", marginBottom: 6 }}>Email Address</label>
+              <div style={{ position: "relative" }}>
+                <Mail size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#9B8B7A" }} />
+                <input type="email" value={formData.email}
+                  onChange={e => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="you@example.com" required
+                  style={{ width: "100%", padding: "12px 14px 12px 42px", borderRadius: 10, border: "1.5px solid rgba(28,20,16,0.15)", background: "#fff", fontSize: 15, color: "#1C1410", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
+                  onFocus={e => e.target.style.borderColor = "#C2600A"}
+                  onBlur={e => e.target.style.borderColor = "rgba(28,20,16,0.15)"}
+                />
               </div>
-
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">Password</label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    className="w-full pl-4 pr-11 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
-                    value={formData.password}
-                    onChange={e => setFormData({...formData, password: e.target.value})}
-                    placeholder={isSignUp ? "Create a password" : "Enter your password"}
-                    required
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    disabled={loading}
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-
-              {!isSignUp && (
-                <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="rounded border-gray-300 text-purple-600 focus:ring-purple-500" />
-                    <span className="ml-2 text-gray-600">Remember me</span>
-                  </label>
-                  <a href="#" className="text-purple-600 hover:text-purple-700 font-medium">Forgot password?</a>
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 rounded-xl text-lg font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                <Sparkles className="mr-2 w-5 h-5" />
-                {loading ? "Loading..." : isSignUp ? "Create Account" : "Sign In"}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </form>
-
-            {/* Divider */}
-            <div className="my-8 flex items-center">
-              <div className="flex-1 border-t border-gray-200"></div>
-              <span className="px-4 text-gray-500 text-sm">or</span>
-              <div className="flex-1 border-t border-gray-200"></div>
             </div>
 
-            {/* Social Login */}
-            <div className="space-y-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleGoogleSignIn}
-                disabled={loading}
-                className="w-full py-3 border-2 border-gray-200 hover:border-gray-300 rounded-xl font-medium flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-                {loading ? "Loading..." : "Continue with Google"}
-              </Button>
-            </div>
-
-            {/* Toggle Sign Up/Sign In */}
-            <div className="mt-8 text-center">
-              <p className="text-gray-600">
-                {isSignUp ? "Already have an account?" : "Don't have an account?"}
-                <button
-                  type="button"
-                  onClick={() => setIsSignUp(!isSignUp)}
-                  className="ml-2 text-purple-600 hover:text-purple-700 font-bold"
-                >
-                  {isSignUp ? "Sign In" : "Sign Up"}
+            <div>
+              <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#3D2E26", marginBottom: 6 }}>Password</label>
+              <div style={{ position: "relative" }}>
+                <input type={showPassword ? "text" : "password"} value={formData.password}
+                  onChange={e => setFormData({ ...formData, password: e.target.value })}
+                  placeholder={isSignUp ? "Create a secure password" : "Enter your password"} required
+                  style={{ width: "100%", padding: "12px 42px 12px 14px", borderRadius: 10, border: "1.5px solid rgba(28,20,16,0.15)", background: "#fff", fontSize: 15, color: "#1C1410", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
+                  onFocus={e => e.target.style.borderColor = "#C2600A"}
+                  onBlur={e => e.target.style.borderColor = "rgba(28,20,16,0.15)"}
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#9B8B7A", display: "flex" }}>
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
-              </p>
+              </div>
             </div>
+
+            {!isSignUp && (
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <a href="#" style={{ fontSize: 13, color: "#C2600A", fontWeight: 600, textDecoration: "none" }}>Forgot password?</a>
+              </div>
+            )}
+
+            <button type="submit" disabled={loading}
+              style={{
+                padding: "14px", borderRadius: 10, marginTop: 4,
+                background: loading ? "#D4A87A" : "linear-gradient(135deg, #C2600A, #E07B39)",
+                color: "#fff", fontSize: 16, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer",
+                border: "none", boxShadow: loading ? "none" : "0 6px 20px rgba(194,96,10,0.35)",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={e => { if (!loading) { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(194,96,10,0.45)"; } }}
+              onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = loading ? "none" : "0 6px 20px rgba(194,96,10,0.35)"; }}
+            >
+              {loading ? (
+                <><div style={{ width: 18, height: 18, border: "2px solid rgba(255,255,255,0.5)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Connecting...</>
+              ) : (
+                <>{isSignUp ? <><User size={18} /> Create Account</> : <><Sparkles size={18} /> Sign In</>} <ArrowRight size={16} /></>
+              )}
+            </button>
+          </form>
+
+          {/* Toggle */}
+          <div style={{ marginTop: 28, textAlign: "center", fontSize: 15, color: "#7A6A5A" }}>
+            {isSignUp ? "Already an artisan?" : "New to CraftAI?"}
+            {" "}
+            <button onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
+              style={{ background: "none", border: "none", color: "#C2600A", fontWeight: 700, cursor: "pointer", fontSize: 15, textDecoration: "underline" }}>
+              {isSignUp ? "Sign In" : "Create free account"}
+            </button>
           </div>
 
-          {/* Trust indicators */}
-          <div className="mt-8 flex items-center justify-center gap-8 text-gray-400 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-              <span>Secure & Encrypted</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-              <span>2,000+ Active Artisans</span>
-            </div>
+          {/* Trust badges */}
+          <div style={{ marginTop: 36, display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
+            {[{ icon: "🔒", label: "256-bit encrypted" }, { icon: "🌍", label: "50+ countries" }, { icon: "⚡", label: "Free forever" }].map((b, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#9B8B7A" }}>
+                <span>{b.icon}</span> {b.label}
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (min-width: 900px) {
+          .login-left { display: flex !important; }
+          .login-mobile-logo { display: none !important; }
+        }
+      `}</style>
     </div>
   );
 }

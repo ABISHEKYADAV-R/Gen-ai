@@ -47,19 +47,19 @@ const ProductCard = React.memo(({
 
   return (
     <Card 
-      className="product-card relative overflow-hidden group transition-all duration-200 hover:shadow-lg hover:scale-[1.02] bg-white cursor-pointer"
+      className="product-card relative overflow-hidden group transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white border border-[rgba(28,20,16,0.08)] cursor-pointer rounded-2xl"
       onClick={handleCardClick}
     >
       {/* Selection Checkbox */}
       <button
         onClick={handleSelect}
-        className="absolute top-3 right-3 z-10 p-1 bg-white/90 backdrop-blur-sm rounded-full shadow-sm transition-all duration-200 hover:bg-white hover:scale-110"
+        className="absolute top-3 right-3 z-10 p-1.5 bg-white/90 backdrop-blur-sm rounded-full shadow-sm transition-all duration-200 hover:bg-white hover:scale-110 border border-[rgba(28,20,16,0.05)]"
         aria-label={`${product.selected ? 'Deselect' : 'Select'} ${product.name}`}
       >
         {product.selected ? (
-          <CheckCircle className="w-5 h-5 text-blue-600 fill-current" />
+          <CheckCircle className="w-5 h-5 text-[#C2600A] fill-current" />
         ) : (
-          <Square className="w-5 h-5 text-gray-400" />
+          <Square className="w-5 h-5 text-[#7A6A5A]" />
         )}
       </button>
 
@@ -84,71 +84,71 @@ const ProductCard = React.memo(({
         )}
         {/* Selection overlay */}
         {product.selected && (
-          <div className="absolute inset-0 bg-blue-600/10 border-2 border-blue-600/20 transition-all duration-200"></div>
+          <div className="absolute inset-0 bg-[#C2600A]/10 border-2 border-[#C2600A]/30 transition-all duration-200"></div>
         )}
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
       </div>
 
       {/* Product Details */}
-      <div className="p-3 sm:p-4">
+      <div className="p-4 sm:p-5">
         <div className="flex items-start justify-between mb-2">
-          <h3 className="font-semibold text-gray-900 text-sm sm:text-base line-clamp-2 flex-1 mr-2">
+          <h3 className="font-craft font-bold text-[#1C1410] text-lg sm:text-xl line-clamp-2 flex-1 mr-2 leading-tight">
             {product.name}
           </h3>
           <button 
-            className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 -mt-1 hover:bg-gray-100 rounded"
+            className="text-[#7A6A5A] hover:text-[#C2600A] transition-colors duration-200 p-1.5 -mt-1 hover:bg-[#F5F0EB] rounded-lg"
             aria-label={`Edit ${product.name}`}
           >
             <Edit className="w-4 h-4" />
           </button>
         </div>
         
-        <p className="text-xs sm:text-sm text-gray-600 mb-2 truncate">{product.category}</p>
-        <p className="text-lg sm:text-xl font-bold text-gray-900 mb-3">${product.price.toFixed(2)}</p>
+        <p className="text-xs sm:text-sm text-[#7A6A5A] mb-2 truncate uppercase tracking-widest font-medium">{product.category}</p>
+        <p className="text-xl sm:text-2xl font-craft font-bold text-[#C2600A] mb-4">${product.price.toFixed(2)}</p>
 
         {/* Materials - Optimized display */}
-        <div className="flex flex-wrap gap-1 mb-3 min-h-[1.5rem]">
+        <div className="flex flex-wrap gap-1.5 mb-3 min-h-[1.5rem]">
           {product.materials.slice(0, 3).map((material, index) => (
             <span
               key={`${product.id}-material-${index}`}
-              className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full whitespace-nowrap transition-colors duration-200 hover:bg-gray-200"
+              className="px-2.5 py-1 bg-[#F5F0EB] text-[#1C1410] text-xs font-medium rounded-md whitespace-nowrap transition-colors duration-200 hover:bg-[#E8E1D7]"
             >
               {material}
             </span>
           ))}
           {product.materials.length > 3 && (
-            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+            <span className="px-2.5 py-1 bg-[#F5F0EB] text-[#1C1410] text-xs font-medium rounded-md">
               +{product.materials.length - 3}
             </span>
           )}
         </div>
 
         {/* Description - Truncated on mobile */}
-        <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2 sm:line-clamp-3 leading-relaxed">
+        <p className="text-sm text-[#7A6A5A] mb-4 line-clamp-2 sm:line-clamp-3 leading-relaxed">
           {product.description}
         </p>
 
         {/* Tags - Optimized display */}
-        <div className="flex flex-wrap gap-1 mb-3 min-h-[1.5rem]">
+        <div className="flex flex-wrap gap-1.5 mb-4 min-h-[1.5rem]">
           {product.tags.slice(0, 2).map((tag, index) => (
             <span
               key={`${product.id}-tag-${index}`}
-              className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full transition-colors duration-200 hover:bg-green-200"
+              className="px-2.5 py-1 bg-[#FDE8D5] text-[#C2600A] text-xs font-medium rounded-md transition-colors duration-200 hover:bg-[#FADBBF]"
             >
               {tag}
             </span>
           ))}
           {product.tags.length > 2 && (
-            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+            <span className="px-2.5 py-1 bg-[#FDE8D5] text-[#C2600A] text-xs font-medium rounded-md">
               +{product.tags.length - 2}
             </span>
           )}
         </div>
 
         {/* Shipping */}
-        <div className="flex items-center text-xs sm:text-sm text-gray-600">
-          <span className="mr-2 text-base">📦</span>
+        <div className="flex items-center text-xs sm:text-sm text-[#7A6A5A] font-medium pt-3 border-t border-[rgba(28,20,16,0.06)]">
+          <span className="mr-2 text-base opacity-80">📦</span>
           <span className="truncate">{product.shipping}</span>
         </div>
       </div>
@@ -468,24 +468,24 @@ export default function ProductsPage() {
   }, [activeTab]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6">
+    <div className="min-h-screen bg-[#F5F0EB] font-inter">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:padding-8">
         {/* Header - Responsive */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div className="mb-4 sm:mb-0">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white/60 backdrop-blur-md p-6 rounded-2xl border border-[rgba(28,20,16,0.04)] shadow-sm">
+            <div className="mb-5 sm:mb-0">
+              <h1 className="text-3xl sm:text-4xl font-craft font-bold text-[#1C1410] mb-2 leading-tight">
                 Products Dashboard
               </h1>
-              <p className="text-sm sm:text-base text-gray-600">
-                Manage your products and explore the marketplace.
+              <p className="text-sm sm:text-base text-[#7A6A5A]">
+                Manage your artisan products and explore the premium marketplace.
               </p>
             </div>
             <div className="flex items-center gap-3">
               <Button
                 onClick={() => window.location.href = '/dashboard'}
                 variant="ghost"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-[#7A6A5A] hover:text-[#1C1410] hover:bg-white/80 rounded-xl"
               >
                 🏠 Dashboard
               </Button>
@@ -493,7 +493,7 @@ export default function ProductsPage() {
                 onClick={handleRefresh}
                 disabled={isRefreshing}
                 variant="outline"
-                className="flex items-center gap-2 w-fit"
+                className="flex items-center gap-2 w-fit border-[#C2600A]/30 text-[#C2600A] hover:bg-[#FDE8D5] hover:text-[#A04E08] rounded-xl transition-all"
               >
                 {isRefreshing ? (
                   <>
@@ -503,7 +503,7 @@ export default function ProductsPage() {
                 ) : (
                   <>
                     <RefreshCw className="w-4 h-4" />
-                    Refresh Products
+                    Refresh
                   </>
                 )}
               </Button>
@@ -512,24 +512,24 @@ export default function ProductsPage() {
         </div>
 
         {/* Tabs Navigation */}
-        <div className="mb-6 border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
+        <div className="mb-8 border-b border-[rgba(28,20,16,0.1)]">
+          <nav className="-mb-px flex space-x-8 px-2">
             <button
               onClick={() => setActiveTab('my-products')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-all duration-200 ${
                 activeTab === 'my-products'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-[#C2600A] text-[#C2600A]'
+                  : 'border-transparent text-[#7A6A5A] hover:text-[#1C1410] hover:border-[#1C1410]/30'
               }`}
             >
               My Products ({products.length})
             </button>
             <button
               onClick={() => setActiveTab('marketplace')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+              className={`py-4 px-2 border-b-2 font-medium text-sm transition-all duration-200 ${
                 activeTab === 'marketplace'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-[#C2600A] text-[#C2600A]'
+                  : 'border-transparent text-[#7A6A5A] hover:text-[#1C1410] hover:border-[#1C1410]/30'
               }`}
             >
               Marketplace ({marketplaceProducts.length})
@@ -541,24 +541,25 @@ export default function ProductsPage() {
           {/* Products Grid - Responsive */}
           <div className="flex-1">
             {isInitialLoad ? (
-              <div className="flex items-center justify-center py-12">
+              <div className="flex items-center justify-center py-20 bg-white/40 rounded-3xl border border-white/50 backdrop-blur-sm">
                 <div className="text-center">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-                  <p className="text-gray-600">Loading products...</p>
+                  <Loader2 className="w-10 h-10 animate-spin mx-auto mb-5 text-[#C2600A]" />
+                  <p className="text-[#7A6A5A] font-medium tracking-wide">Retrieving collection...</p>
                 </div>
               </div>
             ) : currentProducts.length === 0 ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <p className="text-gray-600 mb-4">
-                    {activeTab === 'my-products' ? 'No products found.' : 'No products available in marketplace.'}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {activeTab === 'my-products' 
-                      ? 'Create your first product to see it here.' 
-                      : 'Check back later for new products.'}
-                  </p>
+              <div className="flex flex-col items-center justify-center py-24 bg-white/40 rounded-3xl border border-[rgba(28,20,16,0.04)] backdrop-blur-sm shadow-sm">
+                <div className="w-20 h-20 mb-6 bg-[#F5F0EB] rounded-full flex items-center justify-center shadow-inner">
+                  <span className="text-4xl opacity-50">🏺</span>
                 </div>
+                <p className="text-xl font-craft font-bold text-[#1C1410] mb-3">
+                  {activeTab === 'my-products' ? 'Your workshop is empty.' : 'No artisan items available.'}
+                </p>
+                <p className="text-[15px] text-[#7A6A5A] max-w-md text-center">
+                  {activeTab === 'my-products' 
+                    ? 'Start crafting your story by listing your first artisanal piece today.' 
+                    : 'Check back later as our creatives are busy making new wares.'}
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
@@ -574,21 +575,21 @@ export default function ProductsPage() {
           </div>
 
           {/* Sidebar - Responsive */}
-          <div className="w-full lg:w-80 order-first lg:order-last">
-            <Card className="lg:sticky lg:top-6">
-              <div className="p-4 sm:p-6">
-                <h2 className="text-lg font-semibold mb-4">Bulk Actions</h2>
+          <div className="w-full lg:w-[340px] order-first lg:order-last">
+            <Card className="lg:sticky lg:top-6 bg-white border border-[rgba(28,20,16,0.08)] shadow-lg rounded-2xl overflow-hidden">
+              <div className="p-5 sm:p-6">
+                <h2 className="text-xl font-craft font-bold text-[#1C1410] mb-5">Bulk Actions</h2>
                 
                 {/* Selected Products Count */}
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-600">Selected Products</span>
-                    <span className="font-semibold">{selectedCount} of {totalProducts}</span>
+                <div className="mb-6 bg-[#F5F0EB] p-4 rounded-xl">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium text-[#7A6A5A]">Selected Items</span>
+                    <span className="font-bold text-[#1C1410]">{selectedCount} <span className="text-[#9B8B7A] font-normal">/ {totalProducts}</span></span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-[#E8E1D7] rounded-full h-1.5">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
-                      style={{ width: `${(selectedCount / totalProducts) * 100}%` }}
+                      className="bg-gradient-to-r from-[#F5C842] via-[#E07B39] to-[#C2600A] h-1.5 rounded-full transition-all duration-500 ease-out"
+                      style={{ width: `${totalProducts > 0 ? (selectedCount / totalProducts) * 100 : 0}%` }}
                     ></div>
                   </div>
                 </div>
@@ -600,17 +601,15 @@ export default function ProductsPage() {
                       <Button 
                         onClick={handleBuySelected}
                         disabled={selectedCount === 0 || isLoading}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
+                        className="w-full border-none craft-gradient-bg text-white hover:opacity-90 shadow-[0_4px_14px_rgba(194,96,10,0.3)] transition-all duration-300 rounded-xl py-6 hover:shadow-[0_6px_20px_rgba(194,96,10,0.4)] hover:-translate-y-0.5"
                       >
                         {isLoading ? (
                           <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                             Publishing...
                           </>
                         ) : (
-                          <>
-                            � Publish Selected
-                          </>
+                          <span className="font-bold text-[15px]">✨ Publish Selected</span>
                         )}
                       </Button>
                       
@@ -618,17 +617,15 @@ export default function ProductsPage() {
                         onClick={handleSaveAsDraft}
                         disabled={selectedCount === 0 || isLoading}
                         variant="outline"
-                        className="w-full transition-colors duration-200"
+                        className="w-full border-[#C2600A]/20 text-[#1C1410] hover:bg-[#FDE8D5] hover:text-[#A04E08] transition-colors duration-200 rounded-xl py-6"
                       >
                         {isLoading ? (
                           <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                             Saving...
                           </>
                         ) : (
-                          <>
-                            📄 Save as Draft
-                          </>
+                          <span className="font-medium">📄 Save as Draft</span>
                         )}
                       </Button>
                     </>
@@ -637,17 +634,15 @@ export default function ProductsPage() {
                       <Button 
                         onClick={handleBuySelected}
                         disabled={selectedCount === 0 || isLoading}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white transition-colors duration-200"
+                        className="w-full border-none bg-[#0F3460] text-white hover:bg-[#0A2647] shadow-[0_4px_14px_rgba(15,52,96,0.3)] transition-all duration-300 rounded-xl py-6 hover:shadow-[0_6px_20px_rgba(15,52,96,0.4)] hover:-translate-y-0.5"
                       >
                         {isLoading ? (
                           <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                             Processing...
                           </>
                         ) : (
-                          <>
-                            🛒 Buy Selected
-                          </>
+                          <span className="font-bold text-[15px]">🛒 Buy Selected</span>
                         )}
                       </Button>
                       
@@ -655,9 +650,9 @@ export default function ProductsPage() {
                         onClick={handleSaveAsDraft}
                         disabled={selectedCount === 0 || isLoading}
                         variant="outline"
-                        className="w-full transition-colors duration-200"
+                        className="w-full border-[rgba(28,20,16,0.1)] text-[#1C1410] hover:bg-[#F5F0EB] transition-colors duration-200 rounded-xl py-6"
                       >
-                        ❤️ Add to Wishlist
+                        <span className="font-medium">❤️ Add to Wishlist</span>
                       </Button>
                     </>
                   )}
@@ -666,7 +661,7 @@ export default function ProductsPage() {
                     onClick={handleDiscardSelected}
                     disabled={selectedCount === 0 || isLoading}
                     variant="outline"
-                    className="w-full text-red-600 border-red-200 hover:bg-red-50 transition-colors duration-200"
+                    className="w-full text-[#991B1B] border-[#FCA5A5]/50 hover:bg-[#FEF2F2] hover:text-[#7F1D1D] hover:border-[#F87171] transition-colors duration-200 rounded-xl mt-4"
                   >
                     🗑️ Clear Selection
                   </Button>
@@ -674,21 +669,21 @@ export default function ProductsPage() {
 
                 {/* Selected Items List - Responsive */}
                 {selectedCount > 0 && (
-                  <div className="border-t pt-4">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-3">Selected Items</h3>
-                    <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                  <div className="border-t border-[rgba(28,20,16,0.06)] pt-5">
+                    <h3 className="text-sm font-bold text-[#1C1410] uppercase tracking-wider mb-4">Selected Items</h3>
+                    <div className="space-y-3 max-h-[220px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#D4C3B3] scrollbar-track-transparent">
                       {selectedProducts.map((product) => (
-                        <div key={product.id} className="flex justify-between items-center text-sm py-1">
-                          <span className="text-gray-700 truncate mr-2 flex-1">{product.name}</span>
-                          <span className="font-semibold whitespace-nowrap">${product.price.toFixed(2)}</span>
+                        <div key={product.id} className="flex justify-between items-center text-[13px] py-1">
+                          <span className="text-[#7A6A5A] truncate mr-3 flex-1 font-medium">{product.name}</span>
+                          <span className="font-bold text-[#1C1410] whitespace-nowrap">${product.price.toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
                     
-                    <div className="mt-3 pt-3 border-t">
-                      <div className="flex justify-between items-center font-semibold">
-                        <span>Total Value</span>
-                        <span className="text-lg">${totalValue.toFixed(2)}</span>
+                    <div className="mt-4 pt-4 border-t border-[rgba(28,20,16,0.06)]">
+                      <div className="flex justify-between items-center font-craft">
+                        <span className="font-bold text-[#7A6A5A]">Total Value</span>
+                        <span className="text-2xl font-bold text-[#C2600A]">${totalValue.toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
@@ -696,12 +691,12 @@ export default function ProductsPage() {
 
                 {/* Empty State */}
                 {selectedCount === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <div className="w-12 h-12 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
-                      📦
+                  <div className="text-center py-10 text-[#7A6A5A]">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-[#F5F0EB] rounded-2xl flex items-center justify-center shadow-inner border border-[rgba(28,20,16,0.04)]">
+                      <span className="text-2xl opacity-60">📦</span>
                     </div>
-                    <p className="text-sm">No products selected</p>
-                    <p className="text-xs mt-1">Select products to perform bulk actions</p>
+                    <p className="font-medium text-[#1C1410] mb-1">No products selected</p>
+                    <p className="text-[13px]">Select products to perform bulk actions</p>
                   </div>
                 )}
               </div>

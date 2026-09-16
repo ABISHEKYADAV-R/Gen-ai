@@ -1,4 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { GoogleGenerativeAI } from '@google/generative-ai'
+
+// Initialize Gemini AI for Vision analysis
+const apiKey = process.env.GOOGLE_AI_API_KEY
+const genAI = apiKey && apiKey !== 'demo_key_use_mock_data'
+  ? new GoogleGenerativeAI(apiKey)
+  : null
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,26 +41,48 @@ export async function POST(request: NextRequest) {
     // Convert file to base64 for processing
     const buffer = await file.arrayBuffer()
     const base64 = Buffer.from(buffer).toString('base64')
+    const mimeType = file.type
 
-    // Simulate AI image analysis with more sophisticated responses
-    await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate processing time
+    let imageAnalysis: any
+    let enhancedDescription: string
 
-    // Generate contextual analysis based on image properties
-    const imageAnalysis = await analyzeImageContent(file.name, file.size, base64.length)
-    
-    // Generate enhanced description
-    const enhancedDescription = generateEnhancedDescription(
-      existingDescription,
-      productTitle,
-      category,
-      imageAnalysis
-    )
+    if (genAI) {
+      // Use real Gemini AI Vision for image analysis
+      try {
+        imageAnalysis = await analyzeWithGeminiVision(base64, mimeType, productTitle, category)
+        enhancedDescription = generateEnhancedDescription(
+          existingDescription,
+          productTitle,
+          category,
+          imageAnalysis
+        )
+      } catch (error) {
+        console.error('Gemini Vision analysis failed, falling back to mock:', error)
+        imageAnalysis = getMockAnalysis()
+        enhancedDescription = generateEnhancedDescription(
+          existingDescription,
+          productTitle,
+          category,
+          imageAnalysis
+        )
+      }
+    } else {
+      // Fallback to mock analysis
+      imageAnalysis = getMockAnalysis()
+      enhancedDescription = generateEnhancedDescription(
+        existingDescription,
+        productTitle,
+        category,
+        imageAnalysis
+      )
+    }
 
     return NextResponse.json({
       success: true,
       analysis: imageAnalysis,
       enhancedDescription,
       originalDescription: existingDescription,
+      usingAI: !!genAI,
       metadata: {
         fileName: file.name,
         fileSize: file.size,
@@ -71,8 +100,55 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function analyzeImageContent(fileName: string, fileSize: number, base64Length: number) {
-  // Simulate advanced image analysis
+async function analyzeWithGeminiVision(base64: string, mimeType: string, productTitle: string, category: string) {
+  if (!genAI) throw new Error('Gemini AI not initialized')
+
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+
+  const prompt = `Analyze this craft/artisan product image and provide a concise analysis as JSON:
+{
+  "detectedObjects": ["object1", "object2"],
+  "colors": ["color1", "color2", "color3"],
+  "style": "style description",
+  "quality": "quality assessment",
+  "materials": "material description",
+  "craftTechnique": "technique used"
+}
+Focus on craft-specific details. Be specific and concise.`
+
+  const imageParts = [{
+    inlineData: {
+      data: base64,
+      mimeType: mimeType
+    }
+  }]
+
+  const result = await model.generateContent([prompt, ...imageParts])
+  const response = await result.response
+  const text = response.text()
+
+  try {
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      const analysis = JSON.parse(jsonMatch[0])
+      return {
+        detectedObjects: analysis.detectedObjects || ['handcrafted item'],
+        colors: analysis.colors || ['natural tones'],
+        style: analysis.style || 'artisan craft',
+        quality: analysis.quality || 'handmade quality',
+        materials: analysis.materials || 'handcrafted materials',
+        craftTechnique: analysis.craftTechnique || 'traditional techniques'
+      }
+    }
+  } catch (parseError) {
+    console.error('Error parsing Gemini Vision response:', parseError)
+  }
+
+  // Fallback if parsing fails
+  return getMockAnalysis()
+}
+
+function getMockAnalysis() {
   const analyses = [
     {
       detectedObjects: ['ceramic', 'pottery', 'handcrafted texture'],
@@ -108,9 +184,7 @@ async function analyzeImageContent(fileName: string, fileSize: number, base64Len
     }
   ]
 
-  // Select analysis based on file characteristics
-  const analysisIndex = Math.floor(Math.random() * analyses.length)
-  return analyses[analysisIndex]
+  return analyses[Math.floor(Math.random() * analyses.length)]
 }
 
 function generateEnhancedDescription(
@@ -122,30 +196,8 @@ function generateEnhancedDescription(
   const { detectedObjects, colors, style, quality, materials, craftTechnique } = imageAnalysis
 
   if (existingDescription.trim()) {
-    // Enhance existing description with image analysis
-    const enhancements = [
-      `${existingDescription}\n\nBased on detailed image analysis, this ${productTitle.toLowerCase()} showcases ${quality} with distinctive ${colors.join(', ')}. The ${craftTechnique} is evident in every detail, making this piece a true representation of ${style}.`,
-      
-      `${existingDescription}\n\nOur AI analysis reveals exceptional craftsmanship in this ${productTitle.toLowerCase()}. The ${materials} and ${colors.join(', ')} create a stunning visual impact, while the ${craftTechnique} demonstrates traditional artistry at its finest.`,
-      
-      `${existingDescription}\n\nImage analysis confirms this as a ${quality} piece featuring ${detectedObjects.join(', ')}. The ${colors.join(' and ')} complement the ${style} approach, showcasing the ${craftTechnique} that makes each piece unique.`,
-      
-      `${existingDescription}\n\nAdvanced visual analysis highlights the ${materials} and ${craftTechnique} used in creating this ${productTitle.toLowerCase()}. The ${colors.join(', ')} and ${quality} make this an exceptional example of ${style}.`
-    ]
-    
-    return enhancements[Math.floor(Math.random() * enhancements.length)]
+    return `${existingDescription}\n\nBased on detailed image analysis, this ${productTitle.toLowerCase()} showcases ${quality} with distinctive ${colors.join(', ')}. The ${craftTechnique} is evident in every detail, making this piece a true representation of ${style}.`
   } else {
-    // Generate new description based on image analysis
-    const newDescriptions = [
-      `Exquisite ${productTitle.toLowerCase()} featuring ${quality} and ${craftTechnique}. This ${category.toLowerCase()} piece displays beautiful ${colors.join(', ')} and showcases traditional ${style}. Made with ${materials}, each detail reflects the artisan's mastery of time-honored techniques. Perfect for collectors and those who appreciate authentic handcrafted beauty.`,
-      
-      `Stunning ${productTitle.toLowerCase()} that exemplifies ${quality} through ${craftTechnique}. The rich ${colors.join(' and ')} highlight the ${materials} used in this ${category.toLowerCase()} masterpiece. This piece represents the finest traditions of ${style}, making it an ideal choice for discerning collectors and home decor enthusiasts.`,
-      
-      `Exceptional ${productTitle.toLowerCase()} crafted using ${craftTechnique} and featuring ${materials}. The ${colors.join(', ')} create a captivating visual appeal that speaks to the ${quality} of this ${category.toLowerCase()} piece. Rooted in ${style}, this artwork brings both beauty and cultural significance to any collection.`,
-      
-      `Magnificent ${productTitle.toLowerCase()} showcasing ${craftTechnique} and ${quality}. The ${colors.join(' and ')} perfectly complement the ${materials}, creating a piece that honors the traditions of ${style}. This ${category.toLowerCase()} artwork demonstrates the perfect fusion of traditional techniques with timeless aesthetic appeal.`
-    ]
-    
-    return newDescriptions[Math.floor(Math.random() * newDescriptions.length)]
+    return `Exquisite ${productTitle.toLowerCase()} featuring ${quality} and ${craftTechnique}. This ${category.toLowerCase()} piece displays beautiful ${colors.join(', ')} and showcases traditional ${style}. Made with ${materials}, each detail reflects the artisan's mastery of time-honored techniques. Perfect for collectors and those who appreciate authentic handcrafted beauty.`
   }
 }

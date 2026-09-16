@@ -1,30 +1,86 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useToast } from "../../../lib/ToastContext";
-import {
-  productService,
-  ProductData,
-} from "../../../backend/firebase/productService";
-import {
-  ArrowLeft,
-  Heart,
-  Share2,
-  ShoppingCart,
-  Truck,
-  Shield,
-  Star,
-  MapPin,
-  Clock,
-  Tag,
-  Palette,
-  Hammer,
-  Leaf,
-} from "lucide-react";
+import { productService, ProductData } from "../../../backend/firebase/productService";
+import { ArrowLeft, Heart, Share2, ShoppingCart, Truck, Shield, Star, MapPin, Clock, Tag, Palette, Hammer, Leaf, Sparkles, Globe, User, MessageCircle } from "lucide-react";
 import Image from "next/image";
+
+const MOCK_PRODUCTS: Record<string, Partial<ProductData>> = {
+  "mock-1": {
+    id: "mock-1",
+    title: "Traditional Ikat Textile",
+    category: "Textiles",
+    price: 145,
+    imageUrl: "/api/placeholder/800/800",
+    description: "A genuine, handwoven piece of cultural heritage. Each thread was carefully resist-dyed before weaving to create the intricate edge-blur patterns characteristic of authentic Ikat. Perfect as a wall hanging or a statement throw.",
+    story: "Woven by Sari in her family compound in Bali. 'This motif tells the story of our village\\'s relationship with the river,' she says. 'My grandmother taught me how to count the threads so the water ripples appear just right.' It takes almost three weeks to dye and weave a single piece like this.",
+    materials: ["Cotton", "Natural Indigo", "Handspun Yarn"],
+    techniques: ["Ikat Weaving", "Resist Dyeing"],
+    tags: ["heritage", "sustainable", "wall-art", "bali"],
+    colors: ["Indigo", "Earth Brown", "Cream"],
+    shipping: { estimatedDays: "5-10 days", cost: 15, regions: ["Global"] },
+    hasGlobalShipping: true,
+    isEcoFriendly: true,
+    authenticityBadge: "verified",
+    views: 1243,
+  },
+  "mock-2": {
+    id: "mock-2",
+    title: "Hand-Carved Deity Sculpture",
+    category: "Sculpture",
+    price: 289,
+    imageUrl: "/api/placeholder/800/800",
+    description: "A meticulously hand-carved wooden deity sculpture, crafted using centuries-old techniques. The smooth finish and intricate details make it an extraordinary centerpiece.",
+    story: "Carlos learned woodworking from his father in Oaxaca. 'Every piece of wood has a spirit waiting to be revealed,' he explains. This sculpture was created from sustainably sourced local wood over the course of two months.",
+    materials: ["Copaline Wood", "Natural Pigments"],
+    techniques: ["Hand Carving", "Polishing", "Painting"],
+    tags: ["woodwork", "sculpture", "oaxaca", "spiritual"],
+    colors: ["Natural Wood", "Red", "Gold"],
+    shipping: { estimatedDays: "7-14 days", cost: 25, regions: ["Global"] },
+    hasGlobalShipping: true,
+    isEcoFriendly: true,
+    authenticityBadge: "verified",
+    views: 846,
+  },
+  "mock-3": {
+    id: "mock-3",
+    title: "Silver Filigree Necklace",
+    category: "Jewelry",
+    price: 67,
+    imageUrl: "/api/placeholder/800/800",
+    description: "Delicate silver filigree necklace showcasing incredible precision. Each silver thread is twisted and soldered by hand to form this lightweight lace-like pattern.",
+    story: "Amara brings the ancient Moorish art of filigree from Fes, Morocco to life. 'My hands memorize the patterns, and my heart guides the wire,' she says. This piece honors her ancestors' legacy.",
+    materials: ["925 Sterling Silver"],
+    techniques: ["Filigree", "Soldering", "Twisting"],
+    tags: ["jewelry", "silver", "morocco", "elegant"],
+    colors: ["Silver"],
+    shipping: { estimatedDays: "3-7 days", cost: 8, regions: ["Global"] },
+    hasGlobalShipping: true,
+    isEcoFriendly: false,
+    authenticityBadge: "verified",
+    views: 2043,
+  },
+  "mock-4": {
+    id: "mock-4",
+    title: "Woven Storage Basket",
+    category: "Weaving",
+    price: 34,
+    imageUrl: "/api/placeholder/800/800",
+    description: "Durable, tightly woven storage basket perfect for organizing your home organically. Made from natural elephant grass, it is both beautiful and purely functional.",
+    story: "Kemi and a collective of women in Accra weave these baskets under the shade of a Baobab tree. 'We sing while we weave, our baskets carry our joy,' Kemi notes.",
+    materials: ["Elephant Grass", "Leather"],
+    techniques: ["Basketry", "Dyeing"],
+    tags: ["storage", "home", "accra", "woven"],
+    colors: ["Natural", "Earth Red"],
+    shipping: { estimatedDays: "10-20 days", cost: 12, regions: ["Global"] },
+    hasGlobalShipping: true,
+    isEcoFriendly: true,
+    authenticityBadge: "verified",
+    views: 3180,
+  }
+};
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -32,10 +88,9 @@ export default function ProductDetailPage() {
   const { user } = useAuth();
   const { showToast } = useToast();
 
-  const [product, setProduct] = useState<ProductData | null>(null);
+  const [product, setProduct] = useState<Partial<ProductData> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const productId = params?.id as string;
 
@@ -44,11 +99,18 @@ export default function ProductDetailPage() {
       if (!productId) return;
 
       setIsLoading(true);
+      
+      // Check if it's a mock product from the landing page
+      if (productId.startsWith("mock-") && MOCK_PRODUCTS[productId]) {
+        setProduct(MOCK_PRODUCTS[productId]);
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const result = await productService.getProduct(productId);
         if (result.success && result.product) {
           setProduct(result.product);
-          // Increment view count
           productService.incrementViews(productId);
         } else {
           showToast({
@@ -73,357 +135,275 @@ export default function ProductDetailPage() {
     loadProduct();
   }, [productId, router, showToast]);
 
-  const handleBack = () => {
-    router.back();
-  };
+  const handleBack = () => router.back();
 
   const handleLike = () => {
     setIsLiked(!isLiked);
     showToast({
       type: "success",
       title: isLiked ? "Removed from Favorites" : "Added to Favorites",
-      message: isLiked
-        ? "Product removed from your favorites"
-        : "Product added to your favorites",
+      message: isLiked ? "Product removed from your favorites" : "Product added to your favorites",
     });
   };
 
   const handleShare = async () => {
     if (navigator.share) {
-      try {
-        await navigator.share({
-          title: product?.title,
-          text: product?.description,
-          url: window.location.href,
-        });
-      } catch (error) {
-        console.log("Error sharing:", error);
-      }
+      try { await navigator.share({ title: product?.title, text: product?.description, url: window.location.href }); } catch (e) {}
     } else {
-      // Fallback to copying URL
       navigator.clipboard.writeText(window.location.href);
-      showToast({
-        type: "success",
-        title: "Link Copied",
-        message: "Product link copied to clipboard",
-      });
+      showToast({ type: "success", title: "Link Copied", message: "Product link copied to clipboard" });
     }
   };
 
   const handleContact = () => {
-    showToast({
-      type: "info",
-      title: "Contact Feature",
-      message: "Contact functionality will be available soon!",
-    });
+    showToast({ type: "info", title: "Contact Feature", message: "Contact functionality will be available soon!" });
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 p-3">
-        <div className="max-w-7xl mx-auto">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded mb-3 w-32"></div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 h-64 bg-gray-200 rounded-lg"></div>
-              <div className="space-y-3">
-                <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="h-12 bg-gray-200 rounded"></div>
-                  <div className="h-12 bg-gray-200 rounded"></div>
-                </div>
-                <div className="h-16 bg-gray-200 rounded"></div>
-                <div className="h-8 bg-gray-200 rounded"></div>
-              </div>
-            </div>
-          </div>
+      <div className="min-h-screen bg-[#F5F0EB] flex flex-col pt-12 items-center">
+        <div className="animate-pulse flex flex-col items-center">
+          <Sparkles className="w-8 h-8 text-[#C2600A] opacity-50 mb-4" />
+          <div className="h-6 w-48 bg-[#E8E1D7] rounded-full mb-8"></div>
         </div>
       </div>
     );
   }
 
-  if (!product) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Product Not Found
-          </h2>
-          <p className="text-gray-600 mb-4">
-            The requested product could not be found.
-          </p>
-          <Button onClick={handleBack}>Go Back</Button>
-        </div>
-      </div>
-    );
-  }
+  if (!product) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100">
-      <div className="max-w-7xl mx-auto p-3 py-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-3">
-          <Button
-            variant="outline"
-            onClick={handleBack}
-            className="flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </Button>
-
+    <div className="min-h-screen bg-[#F5F0EB] font-inter text-[#1C1410] selection:bg-[#C2600A] selection:text-white pb-20">
+      
+      {/* Top Nav */}
+      <div className="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-[rgba(28,20,16,0.06)]">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+          <button onClick={handleBack} className="flex items-center gap-2 text-[#7A6A5A] hover:text-[#C2600A] font-medium text-sm transition-colors group">
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            Back to Marketplace
+          </button>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLike}
-              className={`${
-                isLiked ? "bg-red-50 border-red-200 text-red-600" : ""
-              }`}>
-              <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleShare}>
-              <Share2 className="w-4 h-4" />
-            </Button>
+            <button onClick={handleLike} className={`p-2 rounded-full border transition-all ${isLiked ? 'bg-[#FDE8D5] border-[#C2600A]/30 text-[#C2600A]' : 'bg-white border-transparent shadow-sm text-[#7A6A5A] hover:text-[#C2600A]'}`}>
+              <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+            </button>
+            <button onClick={handleShare} className="p-2 rounded-full bg-white shadow-sm text-[#7A6A5A] hover:text-[#C2600A] transition-colors">
+              <Share2 className="w-5 h-5" />
+            </button>
           </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
-          {/* Product Image - Takes 2/3 width on large screens */}
-          <div className="lg:col-span-2">
-            <Card className="overflow-hidden">
-              <div className="relative aspect-[4/3]">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          
+          {/* Left Column: Image & Details */}
+          <div className="lg:col-span-7 flex flex-col gap-8">
+            
+            {/* Image Card (Glassmorphism inspired) */}
+            <div className="relative w-full aspect-square rounded-[32px] overflow-hidden shadow-2xl shadow-[#1C1410]/5 border border-white/50 bg-[#E8E1D7] group">
+              {product.imageUrl ? (
                 <Image
-                  src={product.imageUrl || "/api/placeholder/600/600"}
-                  alt={product.title}
+                  src={product.imageUrl}
+                  alt={product.title as string}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                   priority
                 />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-4xl">🏺</div>
+              )}
+              
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none"></div>
+
+              {/* Badges */}
+              <div className="absolute top-6 left-6 flex flex-col gap-2">
                 {product.isEcoFriendly && (
-                  <div className="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                    <Leaf className="w-3 h-3" />
-                    Eco-Friendly
+                  <div className="bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-[#166534] shadow flex items-center gap-1.5 uppercase tracking-wider">
+                    <Leaf className="w-3.5 h-3.5" /> Eco-Crafted
                   </div>
                 )}
                 {product.authenticityBadge && (
-                  <div className="absolute top-3 right-3 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                    <Shield className="w-3 h-3" />
-                    Verified
+                  <div className="bg-[#1A1A2E]/90 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-[#F5C842] shadow flex items-center gap-1.5 uppercase tracking-wider">
+                    <Shield className="w-3.5 h-3.5" /> Artisan Verified
                   </div>
                 )}
               </div>
-            </Card>
+            </div>
+
+            {/* Artisan Story Section Highlighted */}
+            {product.story && (
+              <div className="bg-white rounded-[24px] p-8 md:p-10 shadow-xl shadow-[#1C1410]/5 border border-[rgba(28,20,16,0.06)] relative overflow-hidden">
+                <div className="absolute -top-10 -right-10 text-[120px] opacity-[0.03] pointer-events-none font-craft leading-none">“</div>
+                <h3 className="font-craft text-2xl font-bold text-[#1C1410] mb-6 flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-full bg-[#FDE8D5] flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-[#C2600A]" />
+                  </span>
+                  The Artisan's Story
+                </h3>
+                <p className="text-lg text-[#3D2E26] leading-relaxed font-craft italic">
+                  {product.story}
+                </p>
+                <div className="mt-8 pt-6 border-t border-[rgba(28,20,16,0.06)] flex items-center justify-between">
+                   <div className="flex items-center gap-3">
+                     <div className="w-10 h-10 rounded-full bg-[#1A1A2E] flex items-center justify-center">
+                       <User className="w-5 h-5 text-[#FBF7F0]" />
+                     </div>
+                     <div>
+                       <div className="font-bold text-sm text-[#1C1410]">Verified Artisan</div>
+                       <div className="text-xs text-[#7A6A5A]">CraftAI Community Member</div>
+                     </div>
+                   </div>
+                   <button onClick={handleContact} className="text-sm font-semibold text-[#C2600A] flex items-center gap-2 hover:opacity-80 transition-opacity">
+                     <MessageCircle className="w-4 h-4" /> Message
+                   </button>
+                </div>
+              </div>
+            )}
+            
+            {/* Description */}
+            <div className="bg-white/60 backdrop-blur-sm rounded-[24px] p-8 border border-[rgba(28,20,16,0.04)]">
+              <h3 className="font-craft text-xl font-bold text-[#1C1410] mb-4">Description</h3>
+              <p className="text-[15px] text-[#7A6A5A] leading-loose">
+                {product.description}
+              </p>
+            </div>
+            
           </div>
 
-          {/* Product Info - Takes 1/3 width on large screens */}
-          <div className="space-y-4">
-            <div>
-              <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-1">
+          {/* Right Column: Checkout & Meta Details */}
+          <div className="lg:col-span-5 flex flex-col gap-6">
+            
+            {/* Main Info Card */}
+            <div className="bg-white rounded-[32px] p-8 shadow-xl shadow-[#1C1410]/5 border border-[rgba(28,20,16,0.06)] flex flex-col">
+              <span className="text-[#C2600A] font-bold text-xs uppercase tracking-[0.2em] mb-3">{product.category}</span>
+              <h1 className="font-craft text-4xl leading-tight font-bold text-[#1C1410] mb-4">
                 {product.title}
               </h1>
-              <p className="text-gray-600 text-sm mb-2">{product.category}</p>
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl font-bold text-amber-600">
-                  ${product.price.toFixed(2)}
-                </span>
-                <div className="flex items-center gap-1 text-gray-600">
-                  <Star className="w-3 h-3 fill-current text-yellow-400" />
-                  <span className="text-xs">4.8 (24)</span>
+              
+              <div className="flex items-center justify-between border-b border-[rgba(28,20,16,0.06)] pb-6 mb-6">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xl text-[#7A6A5A] font-craft">$</span>
+                  <span className="text-4xl font-craft font-bold text-[#1C1410]">
+                    {typeof product.price === 'number' ? product.price.toFixed(2) : parseFloat(String(product.price)).toFixed(2)}
+                  </span>
                 </div>
-                <div className="flex items-center gap-1 text-gray-600">
-                  <Clock className="w-3 h-3" />
-                  <span className="text-xs">{product.views || 0} views</span>
+                <div className="flex flex-col items-end gap-1">
+                   <div className="flex items-center gap-1">
+                     <Star className="w-4 h-4 fill-[#F5C842] text-[#F5C842]" />
+                     <span className="font-bold text-[#1C1410] text-sm">4.9</span>
+                     <span className="text-xs text-[#7A6A5A]">(128)</span>
+                   </div>
+                   <div className="flex items-center gap-1.5 text-xs text-[#7A6A5A]">
+                     <Clock className="w-3 h-3" /> {product.views || 0} views today
+                   </div>
                 </div>
               </div>
+
+              {/* Shipping info inline */}
+              <div className="bg-[#F9F7F5] rounded-2xl p-4 mb-6 border border-[#E8E1D7] flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center">
+                    <Truck className="w-5 h-5 text-[#C2600A]" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-sm text-[#1C1410]">Standard Global Shipping</div>
+                    <div className="text-xs text-[#7A6A5A]">{product.shipping?.estimatedDays || "5-10 days"}</div>
+                  </div>
+                </div>
+                <div className="font-bold text-[#1C1410] text-sm">
+                  {product.shipping?.cost ? `$${product.shipping.cost}` : "Free"}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={handleContact}
+                  className="w-full bg-gradient-to-r from-[#C2600A] to-[#E07B39] text-white py-4 rounded-2xl font-bold shadow-[0_8px_20px_rgba(194,96,10,0.3)] hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(194,96,10,0.4)] transition-all flex items-center justify-center gap-3"
+                >
+                  <ShoppingCart className="w-5 h-5" /> Reserve Item
+                </button>
+                {(!user || user.uid !== product.createdBy) && !MOCK_PRODUCTS[product.id as string] && (
+                  <button
+                    onClick={handleContact}
+                    className="w-full bg-white border-2 border-[rgba(28,20,16,0.1)] text-[#1C1410] py-4 rounded-2xl font-bold hover:border-[#1C1410] transition-colors flex items-center justify-center gap-3"
+                  >
+                    Discuss Custom Order
+                  </button>
+                )}
+              </div>
+              
+              <div className="mt-8 grid grid-cols-3 gap-2">
+                <div className="flex flex-col items-center justify-center text-center p-3 rounded-2xl bg-white/50">
+                   <Shield className="w-5 h-5 text-[#1C1410] mb-2" />
+                   <span className="text-[10px] uppercase font-bold text-[#7A6A5A] tracking-wider">Secure</span>
+                </div>
+                <div className="flex flex-col items-center justify-center text-center p-3 rounded-2xl bg-white/50">
+                   <Globe className="w-5 h-5 text-[#1C1410] mb-2" />
+                   <span className="text-[10px] uppercase font-bold text-[#7A6A5A] tracking-wider">Worldwide</span>
+                </div>
+                <div className="flex flex-col items-center justify-center text-center p-3 rounded-2xl bg-white/50">
+                   <Heart className="w-5 h-5 text-[#1C1410] mb-2" />
+                   <span className="text-[10px] uppercase font-bold text-[#7A6A5A] tracking-wider">Fair Trade</span>
+                </div>
+              </div>
+
             </div>
 
-            {/* Quick Info Cards */}
-            <div className="grid grid-cols-2 gap-2">
+            {/* Spec Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {product.materials && product.materials.length > 0 && (
-                <Card className="p-2">
-                  <h4 className="font-medium text-gray-900 mb-1 flex items-center gap-1 text-xs">
-                    <Palette className="w-3 h-3" />
-                    Materials
+                <div className="bg-white/60 backdrop-blur-sm rounded-[20px] p-5 border border-[rgba(28,20,16,0.04)]">
+                  <h4 className="font-bold text-[#1C1410] mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                    <Palette className="w-4 h-4 text-[#C2600A]" /> Materials
                   </h4>
-                  <div className="flex flex-wrap gap-1">
-                    {product.materials.slice(0, 2).map((material, index) => (
-                      <span
-                        key={index}
-                        className="px-1.5 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full">
-                        {material}
-                      </span>
+                  <div className="flex flex-wrap gap-2">
+                    {product.materials.map((m, i) => (
+                      <span key={i} className="px-3 py-1.5 bg-[#FDE8D5] text-[#C2600A] text-xs font-bold rounded-lg">{m}</span>
                     ))}
-                    {product.materials.length > 2 && (
-                      <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full">
-                        +{product.materials.length - 2}
-                      </span>
-                    )}
                   </div>
-                </Card>
+                </div>
               )}
-
+              
               {product.techniques && product.techniques.length > 0 && (
-                <Card className="p-2">
-                  <h4 className="font-medium text-gray-900 mb-1 flex items-center gap-1 text-xs">
-                    <Hammer className="w-3 h-3" />
-                    Techniques
+                <div className="bg-white/60 backdrop-blur-sm rounded-[20px] p-5 border border-[rgba(28,20,16,0.04)]">
+                  <h4 className="font-bold text-[#1C1410] mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
+                    <Hammer className="w-4 h-4 text-[#C2600A]" /> Techniques
                   </h4>
-                  <div className="flex flex-wrap gap-1">
-                    {product.techniques.slice(0, 2).map((technique, index) => (
-                      <span
-                        key={index}
-                        className="px-1.5 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
-                        {technique}
-                      </span>
+                  <div className="flex flex-wrap gap-2">
+                    {product.techniques.map((t, i) => (
+                      <span key={i} className="px-3 py-1.5 bg-[#E8F0FE] text-[#0F3460] text-xs font-bold rounded-lg">{t}</span>
                     ))}
-                    {product.techniques.length > 2 && (
-                      <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
-                        +{product.techniques.length - 2}
-                      </span>
-                    )}
                   </div>
-                </Card>
+                </div>
               )}
             </div>
 
-            {/* Shipping Info - Compact */}
-            <Card className="p-3">
-              <h3 className="font-medium text-gray-900 mb-2 flex items-center gap-1 text-sm">
-                <Truck className="w-3 h-3" />
-                Shipping
-              </h3>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Time:</span>
-                  <span className="font-medium">
-                    {product.shipping?.estimatedDays || "5-7 days"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Cost:</span>
-                  <span className="font-medium">
-                    {product.shipping?.cost
-                      ? `$${product.shipping.cost}`
-                      : "Free"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Region:</span>
-                  <span className="font-medium">
-                    {product.hasGlobalShipping ? "Worldwide" : "Local"}
-                  </span>
-                </div>
+            {/* Details Footer */}
+            <div className="bg-white/40 backdrop-blur-md rounded-[20px] p-5 border border-[rgba(28,20,16,0.04)]">
+              <div className="flex flex-wrap gap-6 text-sm justify-center">
+                 <div className="flex flex-col items-center gap-1">
+                   <div className="font-bold text-[#1C1410]">Item ID</div>
+                   <div className="text-xs text-[#7A6A5A] uppercase">{product.id?.substring(0,8)}</div>
+                 </div>
+                 {product.colors && product.colors.length > 0 && (
+                   <div className="flex flex-col items-center gap-1">
+                     <div className="font-bold text-[#1C1410]">Hues</div>
+                     <div className="text-xs text-[#7A6A5A] truncate w-24 text-center">{product.colors.join(", ")}</div>
+                   </div>
+                 )}
+                 {product.tags && product.tags.length > 0 && (
+                   <div className="flex flex-col items-center gap-1">
+                     <div className="font-bold text-[#1C1410]">Tags</div>
+                     <div className="flex items-center gap-1 text-xs text-[#7A6A5A]">
+                       <Tag className="w-3 h-3" /> {product.tags.length} labels
+                     </div>
+                   </div>
+                 )}
               </div>
-            </Card>
-
-            {/* Actions */}
-            <div className="space-y-2">
-              <Button
-                className="w-full bg-amber-600 hover:bg-amber-700 text-white py-2"
-                onClick={handleContact}>
-                <ShoppingCart className="w-3 h-3 mr-2" />
-                Contact Artisan
-              </Button>
-
-              {user?.uid !== product.createdBy && (
-                <Button
-                  variant="outline"
-                  className="w-full py-2 text-sm"
-                  onClick={handleContact}>
-                  <MapPin className="w-3 h-3 mr-2" />
-                  Custom Order
-                </Button>
-              )}
             </div>
+
           </div>
-        </div>
-
-        {/* Full Description and Details Below */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-          {/* Description */}
-          <Card className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
-            <p className="text-gray-700 leading-relaxed text-sm">
-              {product.description}
-            </p>
-          </Card>
-
-          {/* Story */}
-          {product.story && (
-            <Card className="p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Artisan's Story
-              </h3>
-              <p className="text-gray-700 leading-relaxed text-sm">
-                {product.story}
-              </p>
-            </Card>
-          )}
-        </div>
-
-        {/* Tags and Colors in a compact row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          {product.colors && product.colors.length > 0 && (
-            <Card className="p-3">
-              <h4 className="font-medium text-gray-900 mb-2 text-sm">Colors</h4>
-              <div className="flex flex-wrap gap-1">
-                {product.colors.map((color, index) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">
-                    {color}
-                  </span>
-                ))}
-              </div>
-            </Card>
-          )}
-
-          {product.tags && product.tags.length > 0 && (
-            <Card className="p-3">
-              <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-1 text-sm">
-                <Tag className="w-3 h-3" />
-                Tags
-              </h4>
-              <div className="flex flex-wrap gap-1">
-                {product.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </Card>
-          )}
-        </div>
-
-        {/* Additional Information - More Compact */}
-        <div className="grid grid-cols-3 gap-3">
-          <Card className="p-3 text-center">
-            <Shield className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-            <h4 className="font-medium text-gray-900 mb-1 text-xs">
-              Authenticity Guaranteed
-            </h4>
-            <p className="text-xs text-gray-600">Verified by experts</p>
-          </Card>
-
-          <Card className="p-3 text-center">
-            <Truck className="w-5 h-5 text-green-500 mx-auto mb-1" />
-            <h4 className="font-medium text-gray-900 mb-1 text-xs">
-              Safe Delivery
-            </h4>
-            <p className="text-xs text-gray-600">Insured shipping</p>
-          </Card>
-
-          <Card className="p-3 text-center">
-            <Heart className="w-5 h-5 text-red-500 mx-auto mb-1" />
-            <h4 className="font-medium text-gray-900 mb-1 text-xs">
-              Support Artisans
-            </h4>
-            <p className="text-xs text-gray-600">Direct support</p>
-          </Card>
         </div>
       </div>
     </div>
